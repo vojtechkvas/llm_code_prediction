@@ -1,13 +1,18 @@
 import json
+import argparse
+from pygments import highlight
+from pygments.lexers import JavaLexer
+from pygments.formatters import TerminalFormatter
+
 
 def evaluate_predictions(data):
     """
-    Displays the 'middle_expected' and 'predicted' values side-by-side
+    Displays the 'middle' and 'middle_prediction' values side-by-side
     for each item in the input data and allows manual evaluation.
 
     Args:
         data (list): A list of dictionaries, where each dictionary contains
-                     'middle_expected' and 'predicted' keys.
+                     'middle' and 'middle_prediction' keys.
 
     Returns:
         list: The updated list of dictionaries with added 'manual_evaluation'.
@@ -15,17 +20,23 @@ def evaluate_predictions(data):
     evaluated_data = []
     for i, item in enumerate(data):
         print(f"\n--- Item {i + 1}, FILENAME: {item.get('filename', 'N/A')} ---")
-        print(f"Middle Expected: \n\n {item.get('middle_expected', 'N/A')}\n")
-        print(f"Predicted:       \n\n {item.get('predicted', 'N/A')}\n")
+
+        print(f"Middle Expected: \n\n \n")
+        print_colored_java(item.get("middle", "Nothing to show"))
+
+        print(f"Predicted:       \n\n  \n")
+        print_colored_java(item.get("middle_prediction", "Nothing to show"))
 
         while True:
-            evaluation = input("Enter manual evaluation (e.g., 1 for good, 0 for bad, skip to leave null): ").strip()
-            if evaluation.lower() == 'skip':
-                item['manual_evaluation'] = None
+            evaluation = input(
+                "Enter manual evaluation (e.g., 0 for bad, 10 for best): "
+            ).strip()
+            if evaluation.lower() == "skip":
+                item["manual_evaluation"] = None
                 break
             try:
                 evaluation_num = int(evaluation)
-                item['manual_evaluation'] = evaluation_num
+                item["manual_evaluation"] = evaluation_num
                 break
             except ValueError:
                 print("Invalid input. Please enter a number or 'skip'.")
@@ -34,6 +45,7 @@ def evaluate_predictions(data):
         print(f"\n\n\n\n")
 
     return evaluated_data
+
 
 def save_to_json(data, filename="evaluated_predictions.json"):
     """
@@ -44,9 +56,10 @@ def save_to_json(data, filename="evaluated_predictions.json"):
         filename (str, optional): The name of the JSON file.
                                    Defaults to "evaluated_predictions.json".
     """
-    with open(filename, 'w') as f:
+    with open(filename, "w") as f:
         json.dump(data, f, indent=4)
     print(f"\nResults saved to {filename}")
+
 
 def load_from_json(filename):
     """
@@ -59,7 +72,7 @@ def load_from_json(filename):
         list: The data loaded from the JSON file.
     """
     try:
-        with open(filename, 'r') as f:
+        with open(filename, "r") as f:
             return json.load(f)
     except FileNotFoundError:
         print(f"Error: File '{filename}' not found.")
@@ -68,11 +81,30 @@ def load_from_json(filename):
         print(f"Error: Could not decode JSON from file '{filename}'.")
         return None
 
-if __name__ == "__main__":
-    input_filename = "mode_completion_dataset2(7).json"
 
-    input_data = load_from_json(input_filename)
+def print_colored_java(java_code):
+    """
+    Print Java code with syntax highlighting to the terminal.
+
+    Args:
+        java_code (str): The Java code to be highlighted
+    """
+    colored_output = highlight(java_code, JavaLexer(), TerminalFormatter())
+    print(colored_output)
+
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(
+        description="Evaluate predictions from a JSON file."
+    )
+    parser.add_argument(
+        "filename", type=str, help="Input JSON file containing predictions"
+    )
+    args = parser.parse_args()
+
+    input_data = load_from_json(args.filename)
 
     if input_data:
         evaluated_data = evaluate_predictions(input_data)
-        save_to_json(evaluated_data)
+        save_to_json(evaluated_data, args.filename)
