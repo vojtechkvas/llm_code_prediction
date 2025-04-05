@@ -19,3 +19,9 @@ pip install git+https://github.com/k4black/codebleu#egg=codebleu
 ```
 pip install tree-sitter-java
 ```
+
+## Important files
+
+Dataset: https://github.com/vojtechkvas/llm_code_prediction/blob/main/data/preprocess_and_result_data/data_manually_evaluated.json
+
+Report: https://github.com/vojtechkvas/llm_code_prediction/blob/main/report.pdf
