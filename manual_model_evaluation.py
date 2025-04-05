@@ -19,12 +19,14 @@ def evaluate_predictions(data):
     """
     evaluated_data = []
     for i, item in enumerate(data):
-        print(f"\n--- Item {i + 1}, FILENAME: {item.get('filename', 'N/A')} ---")
+        print(f"\n--- Item {i + 1}, FILENAME: \033[92m{item.get('filename', 'N/A')}\033[0m ---")
 
-        print(f"Middle Expected: \n\n \n")
+        print(f"\033[91m---------------- Middle Expected ----------------\n\n\033[0m")
+
         print_colored_java(item.get("middle", "Nothing to show"))
 
-        print(f"Predicted:       \n\n  \n")
+        print(f"\033[91m---------------- Middle Predicted ----------------\n\n\033[0m")
+
         print_colored_java(item.get("middle_prediction", "Nothing to show"))
 
         while True:
@@ -107,4 +109,4 @@ if __name__ == "__main__":
 
     if input_data:
         evaluated_data = evaluate_predictions(input_data)
-        save_to_json(evaluated_data, args.filename)
+        save_to_json(evaluated_data, "data_manually_evaluated.json")
