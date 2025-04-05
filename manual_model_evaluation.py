@@ -109,4 +109,4 @@ if __name__ == "__main__":
 
     if input_data:
         evaluated_data = evaluate_predictions(input_data)
-        save_to_json(evaluated_data, "data_manually_evaluated.json")
+        save_to_json(evaluated_data, "data/preprocess_and_result_data/data_manually_evaluated.json")
