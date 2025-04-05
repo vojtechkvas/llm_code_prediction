@@ -1,0 +1,1929 @@
+[
+    {
+        "filename": "data/member/business/RoleService.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.business;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.AbstractService;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.exception.MyEntityNotFoundException;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.repository.IdJpaRepository;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.Role;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.enums.RoleTypeEnum;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.repository.RoleRepository;\nimport org.springframework.stereotype.Service;\n\n@Service\npublic class RoleService extends AbstractService<Role> {\n    private final RoleRepository roleRepository;\n\n    public RoleService(RoleRepository roleRepository) {\n        this.roleRepository = roleRepository;\n    }\n\n    @Override\n    protected IdJpaRepository<R",
+        "middle": "ole, Long> getRepository() {\n        return this.roleRepository;\n    }\n\n    public Role getByType(RoleTypeEnum type) {\n        return roleRepository.findByType(type).orElseThrow(\n       ",
+        "suffix": "         () -> new MyEntityNotFoundException(type + \" does not exist in the database.\")\n        );\n    }\n\n\n}\n",
+        "middle_prediction": "epo>Repository<R> {\n        public RoleService<R>Repository<R>Repository",
+        "exact_match": false,
+        "chrf": {
+            "score": 25.91937857662408,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 85.71428571428571,
+            "num_edits": 12,
+            "ref_length": 14.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.17647058823529413,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 0.4138080991773701,
+            "length_ratio": 0.53125,
+            "translation_length": 17,
+            "reference_length": 32
+        },
+        "rouge": {
+            "rouge1": 0.08,
+            "rouge2": 0.0,
+            "rougeL": 0.08,
+            "rougeLsum": 0.08,
+            "avg": 0.06
+        },
+        "codebleu": {
+            "codebleu": 0.15097891729303176,
+            "ngram_match_score": 0.007842752028330948,
+            "weighted_ngram_match_score": 0.019149840220719184,
+            "syntax_match_score": 0.07692307692307693,
+            "dataflow_match_score": 0.5
+        },
+        "manual_evaluation": 2
+    },
+    {
+        "filename": "data/member/dto/MemberResponseDto.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.dto;\n\n\nimport com.fasterxml.jackson.annotation.JsonFormat;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.enums.PreferredLangEnum;\nimport io.swagger.v3.oas.annotations.media.Schema;\nimport lombok.Data;\n\nimport java.time.LocalDateTime;\n\n@Data\npublic class MemberResponseDto {\n\n    @Schema(example = \"111\")\n    private Long idMember;\n\n    @Schema(example = \"Naftenko\")",
+        "middle": "\n    private String firstName;\n\n    @Sche",
+        "suffix": "ma(example = \"Petrolijevic\")\n    private String middleName;\n\n    @Schema(example = \"Benzinov\")\n    private String lastName;\n\n    @Schema(example = \"true\")\n    private boolean identityCheck;\n\n    @Schema(example = \"{{$randomEmail}}\")\n    private String activeEmail;\n\n    @Schema(example = \"ENG\")\n    private PreferredLangEnum preferredLanguage;\n\n    @JsonFormat(pattern = \"yyyy-MM-dd'T'HH:mm:ss\")\n    @Schema(type = \"string\", example = \"2027-02-19T18:36:06\")\n    private LocalDateTime willBeDeleteAt;\n}\n",
+        "middle_prediction": ";\n    private String name;\n\n    @Schema(example = \"Benzinov\")\n    private",
+        "exact_match": false,
+        "chrf": {
+            "score": 56.81171373592372,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 150.0,
+            "num_edits": 6,
+            "ref_length": 4.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.26666666666666666,
+                0.14285714285714285,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 1.0,
+            "length_ratio": 2.5,
+            "translation_length": 15,
+            "reference_length": 6
+        },
+        "rouge": {
+            "rouge1": 0.36363636363636365,
+            "rouge2": 0.2222222222222222,
+            "rougeL": 0.36363636363636365,
+            "rougeLsum": 0.36363636363636365,
+            "avg": 0.3282828282828283
+        },
+        "codebleu": {
+            "codebleu": 0.43669241140032794,
+            "ngram_match_score": 0.05873949094699214,
+            "weighted_ngram_match_score": 0.1880301546543197,
+            "syntax_match_score": 0.5,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 8
+    },
+    {
+        "filename": "data/member/repository/MemberRepository.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.repository;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.repository.IdJpaRepository;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.Member;\nimport org.springframework.data.domain.Page;\nimport org.springframework.data.domain.Pageable;\nimport org.springframework.data.jpa.repository.Query;\nimport org.springframework.stereotype.Repository;\n\nimport java.util.Optional;\n\n\n@Repository\npublic interface MemberRepository extends IdJpaRepository<Member, Long> {\n    @Query(\"SELECT e FROM Member e WHERE e.activeEmail = :email \" +\n            \"AND e.deletionRequestAt IS NULL \" +\n            \"AND e.deletionRequestComment IS NULL AND e.willBeDeleteAt IS NULL \")\n    Optional<Member> findValidMemberByActiveEmail(String email);\n\n\n    @Query(\"SELECT e FROM Member e WHERE  \" +\n            \" e.deletionRequestAt IS NOT NULL  \" +\n            \"AND e.willBeDeleteAt IS NOT NULL \" +\n            \"AND e.willBeDeleteAt < CURRENT_TIMESTAMP\")\n    Iterable<Member> findMembersToDelete();\n\n    boolean existsByActiveEmail(String email);\n\n    @Query(\"SELECT e FROM Member e WHERE  \" +\n            \" e.identityCheck = :isIdentityCheck \" +\n            \"AND e.deletionRequestAt IS NOT NULL  \" +\n           ",
+        "middle": " \"AND e.willBeDeleteAt IS NOT NULL \"\n    )\n    Page<Member> findAllMembersIdentityCheckAndDeleted",
+        "suffix": "(Pageable pageable, boolean isIdentityCheck);\n\n    @Query(\"SELECT e FROM Member e WHERE  \" +\n            \" e.identityCheck = :isIdentityCheck \" +\n            \"AND e.deletionRequestAt IS  NULL  \" +\n            \"AND e.willBeDeleteAt IS NULL \"\n    )\n    Page<Member> findAllMembersIdentityCheckAndNotDeleted(Pageable pageable, boolean isIdentityCheck);\n\n    Optional<Member> findByIdAndDeletionRequestAtIsNull(Long idMember);\n\n\n    @Query(\"SELECT e FROM Member e WHERE  \" +\n            \"e.idMember = :idMember \" +\n            \"AND e.identityCheck = true \" +\n            \"AND e.deletionRequestAt IS NULL  \" +\n            \"AND e.deletionRequestComment IS NULL \" +\n            \"AND e.willBeDeleteAt IS NULL \"\n    )\n    Optional<Member> findValidAndCheckMemberById(Long idMember);\n\n\n    Optional<Member> findByActiveEmailAndDeletionRequestAtIsNull(String email);\n}\n",
+        "middle_prediction": "\"AND e.willBeDeleteAt < CURRENT_TIMESTAMP\")\n    Optional<Member> findById",
+        "exact_match": false,
+        "chrf": {
+            "score": 41.25272203874311,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 77.77777777777779,
+            "num_edits": 7,
+            "ref_length": 9.0
+        },
+        "bleu": {
+            "bleu": 0.33649324423301513,
+            "precisions": [
+                0.625,
+                0.4666666666666667,
+                0.2857142857142857,
+                0.15384615384615385
+            ],
+            "brevity_penalty": 1.0,
+            "length_ratio": 1.0666666666666667,
+            "translation_length": 16,
+            "reference_length": 15
+        },
+        "rouge": {
+            "rouge1": 0.47058823529411764,
+            "rouge2": 0.26666666666666666,
+            "rougeL": 0.47058823529411764,
+            "rougeLsum": 0.47058823529411764,
+            "avg": 0.41960784313725497
+        },
+        "codebleu": {
+            "codebleu": 0.3174357598269865,
+            "ngram_match_score": 0.05236421927181383,
+            "weighted_ngram_match_score": 0.050712153369465586,
+            "syntax_match_score": 0.16666666666666666,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 5
+    },
+    {
+        "filename": "data/member/repository/RoleAssignmentRepository.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.repository;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.repository.MemberRecordJpaRepository;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.RoleAssignment;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.enums.BlockAccessTypeEnum;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.enums.RoleTypeEnum;\nimport org.springframework.data.jpa.repository.Query;\nimport org.springframework.data.repository.query.Param;\nimport org.springframework.stereotype.Repository;\n\nimport java.util.List;\n\n\n@Repository\npublic interface RoleAssignmentRepository extends MemberRecordJpaRepository<RoleAssignment, Long> {\n\n    boolean existsByMemberIdAndRoleIdAndDeletedAtIsNull(Long idMember, Long roleId);\n\n    @Query(\"SELECT r.type   FROM Role r \" +\n            \"JOIN RoleAssignment ra ON ra.role = r \" +\n            \"JOIN Member m ON ra.member.idMember = m.idMember \" +\n            \"LEFT JOIN Membership ms ON ms.member.idMember = m.idMember \" +\n            \"LEFT JOIN Semester sem ON ms.semester.idSemester = sem.idSemester \" +\n            \"LEFT JOIN MembershipType mt ON ms.membershipType.idMembershipType = mt.idMembershipType  \" +\n            \"LEFT JOIN PaymentMembershipForgiveness pf ON pf.membership.idMembership = ms.idMembership \" +\n            \"LEFT JOIN PaymentMapping pm ON ms.paymentMapping.idPaymentMapping = pm.idPaymentMapping",
+        "middle": " \" +\n            \"LEFT JOIN BlockAccess ba ON ba.member.idMember = m.idMember \" +\n\n\n            \"WHERE \" +\n\n\n            \"   ( ms IS NOT NULL AND mt IS NOT NULL AN",
+        "suffix": "D m.identityCheck = true AND  \" +\n\n            \"  sem.startOfSemester < CURRENT_TIMESTAMP \" +\n            \"  AND CURRENT_TIMESTAMP < sem.endOfSemester \" +\n\n            \"  AND \" +\n            \"   (( \" +\n            \"    pm IS  NULL \" +\n            \"    AND pf IS NOT NULL \" +\n            \"    AND pf.deletedAt IS NULL \" +\n\n            \"    ) OR (\" +\n            \"    pf IS  NULL \" +\n            \"    AND pm  IS NOT NULL \" +\n            \"    AND pm.deletedAt IS NULL \" +\n            \"))) \" +\n\n\n            // access is NOT blocked\n            \" AND ( ba IS  NULL OR \" +\n            \"   (NOT( ba.blockAccessType = :blockAccessTypeEnumNetwork \" +\n            \"       AND CURRENT_TIMESTAMP < ba.blockedEnd AND ba.deletedAt IS NULL )\" +\n            \"   AND  \" +\n            \"   NOT( ba.blockAccessType = :blockAccessTypeEnumGym  \" +\n            \"       AND CURRENT_TIMESTAMP < ba.blockedEnd AND ba.deletedAt IS NULL )\" +\n            \"  )\" +\n            \")  \" +\n\n            \"AND m.activeEmail = :username \" +\n            \"AND ra.deletedAt IS NULL \" +\n            \"AND m.deletionRequestAt IS NULL AND m.willBeDeleteAt IS NULL  \"\n\n    )\n    List<RoleTypeEnum> findValidRolesForMemberByActiveEmail(@Param(\"username\") String username,\n                                                            @Param(\"blockAccessTypeEnumNetwork\") BlockAccessTypeEnum blockAccessTypeEnumNetwork,\n                                                            @Param(\"blockAccessTypeEnumGym\") BlockAccessTypeEnum blockAccessTypeEnumGym);\n\n\n}\n",
+        "middle_prediction": "Mapping = pm.idPaymentMapping \" +\n            \"LEFT JOIN PaymentMappingForgiveness pf ON",
+        "exact_match": false,
+        "chrf": {
+            "score": 16.26731435698425,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 85.18518518518519,
+            "num_edits": 23,
+            "ref_length": 27.0
+        },
+        "bleu": {
+            "bleu": 0.059873699570425404,
+            "precisions": [
+                0.6153846153846154,
+                0.3333333333333333,
+                0.2727272727272727,
+                0.2
+            ],
+            "brevity_penalty": 0.18409420065330423,
+            "length_ratio": 0.37142857142857144,
+            "translation_length": 13,
+            "reference_length": 35
+        },
+        "rouge": {
+            "rouge1": 0.20689655172413796,
+            "rouge2": 0.07407407407407408,
+            "rougeL": 0.20689655172413796,
+            "rougeLsum": 0.20689655172413796,
+            "avg": 0.17369093231162197
+        },
+        "codebleu": {
+            "codebleu": 0.32302924772682556,
+            "ngram_match_score": 0.053108908010966446,
+            "weighted_ngram_match_score": 0.09615094003919297,
+            "syntax_match_score": 0.14285714285714285,
+            "dataflow_match_score": 0.0
+        },
+        "manual_evaluation": 5
+    },
+    {
+        "filename": "data/member/domain/Room.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.domain;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.domain.Identifiable;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.enums.DormitoryEnum;\nimport jakarta.persistence.*;\nimport lombok.Data;\n\n@Data\n@Entity\n@Table(name = \"room\", uniqueConstraints = {\n        @UniqueConstraint(name = \"room_dormitory_roomNumber\", columnNames = {\"dormitory\", \"roomNumber\"})\n})\npublic class Room implements Identifiable {\n\n    @Id\n    @Column(name = \"id_room\")\n    @GeneratedVa",
+        "middle": "lue(strategy = GenerationType.SEQUENCE)\n    private Long idRoom;\n\n    @Column(name = \"dormitory\", nullable = false, length = 256)\n    @Enumerated(EnumType.STRING)\n    private ",
+        "suffix": "DormitoryEnum dormitory;\n\n    @Column(name = \"roomNumber\", nullable = false, length = 256)\n    private String roomNumber;\n\n    public Room(DormitoryEnum dormitory, String roomNumber) {\n        this.dormitory = dormitory;\n        this.roomNumber = roomNumber;\n    }\n\n    public Room() {\n\n    }\n\n    @Override\n    public Long getId() {\n        return this.idRoom;\n    }\n}\n",
+        "middle_prediction": "lue(name = \"roomNumber\")\n    public String roomNumber;\n\n    public Room(D",
+        "exact_match": false,
+        "chrf": {
+            "score": 12.43309568432601,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 94.11764705882352,
+            "num_edits": 16,
+            "ref_length": 17.0
+        },
+        "bleu": {
+            "bleu": 0.05423141787698755,
+            "precisions": [
+                0.5625,
+                0.26666666666666666,
+                0.14285714285714285,
+                0.07692307692307693
+            ],
+            "brevity_penalty": 0.26914634872918386,
+            "length_ratio": 0.43243243243243246,
+            "translation_length": 16,
+            "reference_length": 37
+        },
+        "rouge": {
+            "rouge1": 0.2222222222222222,
+            "rouge2": 0.0,
+            "rougeL": 0.2222222222222222,
+            "rougeLsum": 0.2222222222222222,
+            "avg": 0.16666666666666666
+        },
+        "codebleu": {
+            "codebleu": 0.14083069514531546,
+            "ngram_match_score": 0.009017608727734442,
+            "weighted_ngram_match_score": 0.010445522730720384,
+            "syntax_match_score": 0.21052631578947367,
+            "dataflow_match_score": 0.3333333333333333
+        },
+        "manual_evaluation": 6
+    },
+    {
+        "filename": "data/member/dto/UniversityCreateDto.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.dto;\n\nimport io.swagger.v3.oas.annotations.media.Schema;\nimport jakarta.validation.constraints.NotBlank;\nimport jakarta.validation.constraints.Size;\nimport lombok.Data;\n\n@Data\npublic class UniversityCreateDto {\n\n\n    @Schema(example = \"CVUT {{countryShort3Chars}}\")\n    @NotBlank(message = \"name cannot be blank\")\n    @Size(max = 256",
+        "middle": ", message = \"'${validatedValue}' cannot exceed {max} characters.\")\n    private String name;\n\n\n    @Schema(example = \"CVUT {{countryShort3Chars}}\")\n    @NotBlank(message = \"nameEn english cannot be",
+        "suffix": " blank\")\n    @Size(max = 256, message = \"'${validatedValue}' cannot exceed {max} characters.\")\n    private String nameEn;\n}\n",
+        "middle_prediction": "6, message = \"'${validatedValue}' cannot exceed {max} characters.\")\n    private String name",
+        "exact_match": false,
+        "chrf": {
+            "score": 51.572711845127806,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 57.14285714285714,
+            "num_edits": 12,
+            "ref_length": 21.0
+        },
+        "bleu": {
+            "bleu": 0.3357991485057844,
+            "precisions": [
+                0.9565217391304348,
+                0.9545454545454546,
+                0.9523809523809523,
+                0.95
+            ],
+            "brevity_penalty": 0.3522274099927112,
+            "length_ratio": 0.48936170212765956,
+            "translation_length": 23,
+            "reference_length": 47
+        },
+        "rouge": {
+            "rouge1": 0.6206896551724138,
+            "rouge2": 0.5925925925925926,
+            "rougeL": 0.6206896551724138,
+            "rougeLsum": 0.6206896551724138,
+            "avg": 0.6136653895274584
+        },
+        "codebleu": {
+            "codebleu": 0.42912066310237584,
+            "ngram_match_score": 0.31670213123012103,
+            "weighted_ngram_match_score": 0.39978052117938234,
+            "syntax_match_score": 0.3333333333333333,
+            "dataflow_match_score": 0.6666666666666666
+        },
+        "manual_evaluation": 8
+    },
+    {
+        "filename": "data/member/repository/MemberEntityListener.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.repository;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.domain.RecordableDeleteEntity;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.domain.RecordableEntity;\nimport cz.cvut.fit.kvasvojt.sinis.modules.election.domain.Candidate;\nimport cz.cvut.fit.kvasvojt.sinis.modules.election.domain.Commissar;\nimport cz.cvut.fit.kvasvojt.sinis.modules.election.domain.Vote;\nimport cz.cvut.fit.kvasvojt.sinis.modules.fitness.domain.FitnessCard;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.Member;\nimport cz.cvut.fit.kvasvojt.sinis.modules.payment.domain.Membership;\nimport cz.cvut.fit.kvasvojt.sinis.modules.printer.domain.Transaction;\nimport cz.cvut.fit.kvasvojt.sinis.modules.stuff.domain.StuffAs",
+        "middle": "signment;\nimport jakarta.persistence.PreRemove;\nimport org",
+        "suffix": ".springframework.stereotype.Component;\nimport org.springframework.transaction.annotation.Transactional;\n\n@Component\npublic class MemberEntityListener {\n\n\n    @PreRemove\n    @Transactional\n    public void preRemove(Member member) {\n\n\n        Iterable<FitnessCard> fitnessCards = member.getFitnessCards();\n\n        fitnessCards.forEach(fitnessCard -> {\n            fitnessCard.setMember(null);\n            if (!fitnessCard.isDeleted()) {\n\n                fitnessCard.delete(member.getDeletionRequestBy(), \"Card delete, because of member deletion.\");\n            }\n\n        });\n\n\n        Iterable<StuffAssignment> stuffAssignments = member.getStuffAssignments();\n\n        stuffAssignments.forEach(stuffAssignment -> stuffAssignment.setMember(null));\n\n        Iterable<Transaction> transactions = member.getTransactions();\n\n        transactions.forEach(transaction -> transaction.setMember(null));\n\n        Iterable<Membership> memberships = member.getMemberships();\n\n        memberships.forEach(transaction -> transaction.setMember(null));\n\n        Iterable<Vote> votes = member.getVotes();\n        votes.forEach(vote -> vote.setMember(null));\n\n        Iterable<Candidate> candidates = member.getCandidates();\n        candidates.forEach(candidate -> candidate.setMember(null));\n\n        Iterable<Commissar> commissars = member.getCommissars();\n        commissars.forEach(candidate -> candidate.setMember(null));\n\n\n        setCreatedByToNull(member.getElectionsCreatedBy());\n        setCreatedByToNull(member.getCommissarsCreated());\n        setCreatedByToNull(member.getOfflineVotesCreated());\n        setCreatedByToNull(member.getCandidatesCreated());\n        setCreatedByToNull(member.getBlockDevicesCreated());\n        setCreatedByToNull(member.getSwitchesCreated());\n        setCreatedByToNull(member.getPortsCreated());\n        setCreatedByToNull(member.getSocketsCreated());\n        setCreatedByToNull(member.getDeviceCreated());\n        setCreatedByToNull(member.getResourceCreated());\n        setCreatedByToNull(member.getTransactionsCreated());\n        setCreatedByToNull(member.getPaymentAbstractsCreated());\n        setCreatedByToNull(member.getPaymentMappingsCreated());\n        setCreatedByToNull(member.getPaymentMembershipForgivenessesCreated());\n        setCreatedByToNull(member.getRoleAssignmentsCreated());\n        setCreatedByToNull(member.getRoomAccommodationsCreated());\n        setCreatedByToNull(member.getAddressesCreated());\n        setCreatedByToNull(member.getBlockMembershipsCreated());\n        setCreatedByToNull(member.getAssociateFacultiesCreated());\n        setCreatedByToNull(member.getEmailSinisAliasesCreated());\n        setCreatedByToNull(member.getFitnessCardsCreated());\n        setCreatedByToNull(member.getStuffAssignmentsCreated());\n\n\n        setDeletedByToNull(member.getElectionsDeletedBy());\n        setDeletedByToNull(member.getCommissarsDeletedBy());\n        setDeletedByToNull(member.getOfflineVotesDeletedBy());\n        setDeletedByToNull(member.getCandidatesDeletedBy());\n        setDeletedByToNull(member.getBlockDevicesDeletedBy());\n        setDeletedByToNull(member.getSwitchesDeletedBy());\n        setDeletedByToNull(member.getPortsDeletedBy());\n        setDeletedByToNull(member.getSocketsDeletedBy());\n        setDeletedByToNull(member.getDeviceDeletedBy());\n        setDeletedByToNull(member.getResourceDeletedBy());\n        setDeletedByToNull(member.getTransactionsDeletedBy());\n        setDeletedByToNull(member.getPaymentAbstractsDeletedBy());\n        setDeletedByToNull(member.getPaymentMappingsDeletedBy());\n        setDeletedByToNull(member.getPaymentMembershipForgivenessesDeletedBy());\n        setDeletedByToNull(member.getRoleAssignmentsDeletedBy());\n        setDeletedByToNull(member.getRoomAccommodationsDeletedBy());\n        setDeletedByToNull(member.getAddressesDeletedBy());\n        setDeletedByToNull(member.getBlockMembershipsDeletedBy());\n        setDeletedByToNull(member.getAssociateFacultiesDeletedBy());\n        setDeletedByToNull(member.getEmailSinisAliasDeletedBy());\n        setDeletedByToNull(member.getFitnessCardsDeletedBy());\n        setDeletedByToNull(member.getStuffAssignmentsDeletedBy());\n\n\n        setCreatedByToNull(member.getVoteOnlyCreatedBy());\n        setCreatedByToNull(member.getSessionOnlyCreatedBy());\n        setCreatedByToNull(member.getGymAccessLogOnlyCreatedBy());\n\n        member.getMembersIdentityCheck().forEach(m -> m.setIdentityCheckBy(null));\n        member.getMembersDeletionRequest().forEach(m -> m.setDeletionRequestBy(null));\n        member.getMembersUpdatedBy().forEach(s -> s.setUpdatedBy(null));\n    }\n\n    private void setCreatedByToNull(Iterable<? extends RecordableEntity> list) {\n        list.forEach(created -> created.setCreatedBy(null));\n    }\n\n    private void setDeletedByToNull(Iterable<? extends RecordableDeleteEntity> list) {\n        list.forEach(deleted -> deleted.setDeletedBy(null));\n    }\n}\n",
+        "middle_prediction": "tAssignment;\nimport org.springframework.stereotype.Component;\nimport org.springframework.stereotype",
+        "exact_match": false,
+        "chrf": {
+            "score": 41.71240242305089,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 60.0,
+            "num_edits": 3,
+            "ref_length": 5.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.4117647058823529,
+                0.1875,
+                0.06666666666666667,
+                0.0
+            ],
+            "brevity_penalty": 1.0,
+            "length_ratio": 1.5454545454545454,
+            "translation_length": 17,
+            "reference_length": 11
+        },
+        "rouge": {
+            "rouge1": 0.3529411764705882,
+            "rouge2": 0.13333333333333333,
+            "rougeL": 0.3529411764705882,
+            "rougeLsum": 0.3529411764705882,
+            "avg": 0.29803921568627445
+        },
+        "codebleu": {
+            "codebleu": 0.4097841218080183,
+            "ngram_match_score": 0.06389431042462725,
+            "weighted_ngram_match_score": 0.0752421768074461,
+            "syntax_match_score": 0.5,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 2
+    },
+    {
+        "filename": "data/member/dto/BlockAccessResponseDto.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.dto;\n\nimport com.fasterxml.jackson.annotation.JsonFormat;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.dto.RecordableDeleteEntityAndMemberResponseDto;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.enums.BlockAccessTypeEnum;\nimport io.swagger.v3.oas.annotations.media.Schema;\nimport lombok.Data;\nimport lombok.EqualsAndHashCode;\n\nimport java.time.LocalDateTime;\n\n@EqualsAndHashCode(callSuper = true)\n@Data\npublic class BlockAccessResponseDto extends RecordableDeleteEntityAndMemberResponseDto {\n\n    @Schema(example = \"1\")\n    private Long idBlockAccess;\n\n    @Schema(example = \"NETWORK_ACCESS\")\n    private BlockAccessTypeEnum blockAccessType;\n\n    @Sche",
+        "middle": "ma(examp",
+        "suffix": "le = \"You complain too much.\")\n    private String messageForBlockMember;\n\n    @Schema(type = \"string\", example = \"2026-08-15T18:36:06\")\n    @JsonFormat(pattern = \"yyyy-MM-dd'T'HH:mm:ss\")\n    private LocalDateTime blockedEnd;\n}\n",
+        "middle_prediction": "p(example = \"1\")\n    private String messageForBlockAccessType;\n\n    @Schema(type",
+        "exact_match": false,
+        "chrf": {
+            "score": 24.665321159272338,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 700.0,
+            "num_edits": 7,
+            "ref_length": 1.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.0625,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 1.0,
+            "length_ratio": 5.333333333333333,
+            "translation_length": 16,
+            "reference_length": 3
+        },
+        "rouge": {
+            "rouge1": 0.0,
+            "rouge2": 0.0,
+            "rougeL": 0.0,
+            "rougeLsum": 0.0,
+            "avg": 0.0
+        },
+        "codebleu": {
+            "codebleu": 0.375,
+            "ngram_match_score": 0,
+            "weighted_ngram_match_score": 0,
+            "syntax_match_score": 0.5,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 7
+    },
+    {
+        "filename": "data/member/business/UniversityService.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.business;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.AbstractService;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.exception.AttributeOfEntityTakenException;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.repository.IdJpaRepository;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.University;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.repository.UniversityRepository;\nimport org.springframework.stereotype.Service;\n\n@Service\npublic class UniversityService extends AbstractService<University> {\n    private final UniversityRepository universityRepository;\n\n    public UniversityService(UniversityRepository universityRepository) {\n        this.universityRepository = universityRepository;\n    }\n\n    @Override\n    protected IdJpaRepository<University, Long> getRepository() {\n        return this.universityRepository;\n    }\n\n\n    @Override\n    public University create(University university) {\n\n        if (universityRepository.existsByNameEn(university.getNameEn())) {\n            throw new AttributeOfEntityTakenException",
+        "middle": "(\"NameEn already exist with this universityEn attribute.\");\n        }\n\n        i",
+        "suffix": "f (universityRepository.existsByName(university.getName())) {\n            throw new AttributeOfEntityTakenException(\"Name already exist with this university attribute.\");\n        }\n\n        return super.create(university);\n    }\n\n}\n",
+        "middle_prediction": "Exception(\"Name already exist with this university attribute.\");\n        }\n\n        return super.create(university",
+        "exact_match": false,
+        "chrf": {
+            "score": 72.80588463943808,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 44.44444444444444,
+            "num_edits": 4,
+            "ref_length": 9.0
+        },
+        "bleu": {
+            "bleu": 0.3665134361137304,
+            "precisions": [
+                0.5714285714285714,
+                0.45,
+                0.3157894736842105,
+                0.2222222222222222
+            ],
+            "brevity_penalty": 1.0,
+            "length_ratio": 1.4,
+            "translation_length": 21,
+            "reference_length": 15
+        },
+        "rouge": {
+            "rouge1": 0.5,
+            "rouge2": 0.33333333333333326,
+            "rougeL": 0.5,
+            "rougeLsum": 0.5,
+            "avg": 0.4583333333333333
+        },
+        "codebleu": {
+            "codebleu": 0.4617342463378674,
+            "ngram_match_score": 0.31239399369202553,
+            "weighted_ngram_match_score": 0.36787632499277756,
+            "syntax_match_score": 0.16666666666666666,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 7
+    },
+    {
+        "filename": "data/member/domain/Language.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.domain;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.domain.RecordableMember;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.enums.PreferredLangEnum;\nimport jakarta.persistence.*;\nimport lombok.Data;\nimport lombok.EqualsAndHashCode;\n\nimport java.io.Serializable;\n\n@EqualsAndHashCode(callSuper = true)\n@Data\n@Entity\n@Table(name = \"language\")\npublic class Language extends RecordableMember implements Serializable {\n\n    private static final",
+        "middle": " long serialVersionUID = 2L;\n\n    @Id\n    @GeneratedValue(strategy =",
+        "suffix": " GenerationType.SEQUENCE)\n    @Column(name = \"id_language\")\n    private Long idLanguage;\n\n    @Column(name = \"preferred_language\", nullable = false, length = 256)\n    @Enumerated(EnumType.STRING)\n    private PreferredLangEnum preferredLanguage = PreferredLangEnum.CZ;\n\n    @Override\n    public Long getId() {\n        return this.idLanguage;\n    }\n\n}\n",
+        "middle_prediction": "Type = Language;\n    private static finalId = 0;\n\n    public static finalId = ",
+        "exact_match": false,
+        "chrf": {
+            "score": 13.588772913781932,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 142.85714285714286,
+            "num_edits": 10,
+            "ref_length": 7.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.21428571428571427,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 1.0,
+            "length_ratio": 1.1666666666666667,
+            "translation_length": 14,
+            "reference_length": 12
+        },
+        "rouge": {
+            "rouge1": 0.0,
+            "rouge2": 0.0,
+            "rougeL": 0.0,
+            "rougeLsum": 0.0,
+            "avg": 0.0
+        },
+        "codebleu": {
+            "codebleu": 0.13883509574587813,
+            "ngram_match_score": 0.020255986027125642,
+            "weighted_ngram_match_score": 0.03508439695638687,
+            "syntax_match_score": 0.0,
+            "dataflow_match_score": 0.5
+        },
+        "manual_evaluation": 2
+    },
+    {
+        "filename": "data/member/controller/RoomController.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.controller;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.controller.AbstractModelMapperController;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.business.RoomService;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.Room;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.dto.RoomResponseDto;\nimport io.swagger.v3.oas.annotations.Operation;\nimport io.swagger.v3.oas.ann",
+        "middle": "otations.tags.Tag;\nimport org.modelmapper.ModelMapper;",
+        "suffix": "\nimport org.springframework.http.HttpStatus;\nimport org.springframework.web.bind.annotation.GetMapping;\nimport org.springframework.web.bind.annotation.ResponseStatus;\nimport org.springframework.web.bind.annotation.RestController;\n\nimport java.util.Collection;\n\n@Tag(name = \"Member\")\n@RestController\npublic class RoomController extends AbstractModelMapperController<Room, RoomResponseDto, RoomResponseDto> {\n\n    private final RoomService roomService;\n\n    RoomController(RoomService roomService, ModelMapper modelMapper) {\n        super(modelMapper);\n        this.roomService = roomService;\n    }\n\n    @Operation(\n            summary = \"Get all rooms\",\n            description = \"This endpoint return all rooms, which can be possibly link to member.\"\n    )\n    @ResponseStatus(HttpStatus.OK)\n    @GetMapping(\"/rooms\")\n    public Collection<RoomResponseDto> getAll() {\n        return convertManyToDTO(roomService.getAll());\n    }\n\n    @Override\n    protected Class<Room> getEntityClass() {\n        return Room.class;\n    }\n\n    @Override\n    protected Class<RoomResponseDto> getDtoClass() {\n        return RoomResponseDto.class;\n    }\n}\n",
+        "middle_prediction": "s.annotations.Operation;\nimport io.swagger.v3.oas.annotations.",
+        "exact_match": false,
+        "chrf": {
+            "score": 30.098736839421314,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 66.66666666666666,
+            "num_edits": 2,
+            "ref_length": 3.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.35294117647058826,
+                0.0625,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 1.0,
+            "length_ratio": 1.3076923076923077,
+            "translation_length": 17,
+            "reference_length": 13
+        },
+        "rouge": {
+            "rouge1": 0.125,
+            "rouge2": 0.0,
+            "rougeL": 0.125,
+            "rougeLsum": 0.125,
+            "avg": 0.09375
+        },
+        "codebleu": {
+            "codebleu": 0.4913446152771302,
+            "ngram_match_score": 0.11362193664674995,
+            "weighted_ngram_match_score": 0.13747081017605653,
+            "syntax_match_score": 0.7142857142857143,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 2
+    },
+    {
+        "filename": "data/member/domain/BlockAccess.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.domain;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.domain.RecordableMember;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.enums.BlockAccessTypeEnum;\nimport jakarta.persistence.*;\nimport lombok.Data;\nimport lombok.EqualsAndHashCode;\n\nimport java.time.LocalDateTime;\n\n@EqualsAndHashCode(callSuper = true)\n@Data\n@Entity\n@Table(name = \"block_access\")\npublic class BlockAccess extends RecordableMember {\n\n    @Id\n    @GeneratedValue(strategy = GenerationType.SEQUENCE)\n    @Column(name = \"id_block_access\")\n    private Long idBlockAccess;\n\n    @Temporal(TemporalType.TIMESTAMP)\n    @Column(name = \"blocked_end\", nullable = false)\n    private LocalDateTime blockedEnd;\n\n    @Enumerated(EnumType.STRING)\n    @Column(name = \"block_access_type\", nullable = false)\n    private BlockAccessTypeEnum blockAccessType;\n\n    @C",
+        "middle": "olumn(name = \"message_for_block_member\", nullable = false, length = 100)\n    private String messageForBlockMember;\n\n    public BlockAccess() {\n        super();\n    }\n\n    @Override\n  ",
+        "suffix": "  public Long getId() {\n        return idBlockAccess;\n    }\n}\n",
+        "middle_prediction": "onstraint(TemporalType.TIMESTAMP)\n    @Column(name = \"block_access_time",
+        "exact_match": false,
+        "chrf": {
+            "score": 17.91547906996465,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 94.44444444444444,
+            "num_edits": 17,
+            "ref_length": 18.0
+        },
+        "bleu": {
+            "bleu": 0.05624630897729734,
+            "precisions": [
+                0.5882352941176471,
+                0.25,
+                0.13333333333333333,
+                0.07142857142857142
+            ],
+            "brevity_penalty": 0.2907492353099861,
+            "length_ratio": 0.4473684210526316,
+            "translation_length": 17,
+            "reference_length": 38
+        },
+        "rouge": {
+            "rouge1": 0.15999999999999998,
+            "rouge2": 0.0,
+            "rougeL": 0.15999999999999998,
+            "rougeLsum": 0.15999999999999998,
+            "avg": 0.11999999999999998
+        },
+        "codebleu": {
+            "codebleu": 0.25306991714727134,
+            "ngram_match_score": 0.0024261436019258793,
+            "weighted_ngram_match_score": 0.009853524987159525,
+            "syntax_match_score": 0.0,
+            "dataflow_match_score": 0.0
+        },
+        "manual_evaluation": 6
+    },
+    {
+        "filename": "data/member/controller/RoleAssignmentController.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.controller;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.AbstractMemberService;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.controller.AbstractMemberController;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.dto.RecordableDeleteEntityCreateDto;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.business.MemberService;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.business.RoleAssignmentService;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.business.RoleService;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.Member;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.Role;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.RoleAssignment;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.dto.RoleAssignmentCreateDto;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.dto.RoleAssignmentResponseDto;\nimport io.swagger.v3.oas.annotations.Operation;\nimport io.swagger.v3.oas.annotations.Parameter;\nimport io.swagger.v3.oas.annotations.media.Content;\nimport io.swagger.v3.oas.annotations.media.Schema;\nimport io.swagger.v3.oas.annotations.responses.ApiResponse;\nimport io.swagger.v3.oas.annotations.tags.Tag;\nimport org.modelmapper.ModelMapper;\nimport org.springframework.data.domain.Page;\nimport org.springframework.data.domain.Pageable;\nimport org.springframework.data.domain.Sort;\nimport org.springframework.data.web.PageableDefault;\nimport org.springframework.http.HttpStatus;\nimport org.springframework.http.ResponseEntity;\nimport org.springframework.security.access.prepost.PreAuthorize;\nimport org.springframework.security.core.annotation.AuthenticationPrincipal;\nimport org.springframework.validation.annotation.Validated;\nimport org.springframework.web.bind.annotation.*;\n\nimport java.util.Map;\n\n@Tag(name = \"Member\")\n@RestController\npublic class RoleAssignmentController extends AbstractMemberController<RoleAssignment, RoleAssignmentResponseDto, RoleAssignmentCreateDto> {\n\n    private final RoleAssignmentService roleAssignmentService;\n    private final RoleService roleService;\n\n    RoleAssignmentController(RoleAssignmentService roleAssignmentService, MemberService memberService, ModelMapper modelMapper, RoleService roleService) {\n        super(modelMapper, memberService);\n        this.roleAssignmentService = roleAssignmentService;\n        this.roleService = roleService;\n    }\n\n    @Operation(\n            summary = \"Get all role assignment related to member\",\n            description = \"This endpoint return role assignments related to member. Endpoint can filter out deleted role assignments.\"\n    )\n    @Override\n    @ResponseStatus(HttpStatus.OK)\n    @GetMapping(\"/members/{idMember}/role-assignments\")\n    @PreAuthorize(\"@memberAuthorization.isRegistrarOfRoleOrOwner(authentication, #idMember)\")\n    public ResponseEntity<Page<RoleAssignmentResponseDto>",
+        "middle": "> getAllByMemberId(\n            @PathVariable Long idM",
+        "suffix": "ember,\n            @RequestParam(required = false, defaultValue = \"true\") boolean isNotDeleted,\n            @RequestParam Map<String, String> filterParams,\n\n            @PageableDefault(page = 0, size = 20, sort = \"createdAt\", direction = Sort.Direction.DESC)\n            Pageable pageable\n    ) {\n        return super.getAllByMemberId(idMember, isNotDeleted, filterParams, pageable);\n    }\n\n    @Operation(\n            summary = \"Create role assignment\",\n            description = \"Create role assignment and link it to member.\"\n    )\n    @ApiResponse(responseCode = \"409\", content = @Content(schema = @Schema(example = \"{\\n    \\\"message\\\": \\\"Member already owns this role.\\\"\\n}\")))\n    @ApiResponse(responseCode = \"404\", content = @Content(schema = @Schema(example = \"{\\\"message\\\": \\\"Entity with id = 1 not found.\\\"}\")))\n    @ResponseStatus(HttpStatus.CREATED)\n    @PostMapping(\"/role-assignments\")\n    @PreAuthorize(\"@memberAuthorization.isRegistrarOfRole(authentication, #roleAssignmentCreateDto.getRole())\")\n    public ResponseEntity<RoleAssignmentResponseDto> create(@RequestBody @Validated RoleAssignmentCreateDto roleAssignmentCreateDto, @AuthenticationPrincipal Member loginMember) {\n\n        RoleAssignment newRoleAssignment = convertToEntity(roleAssignmentCreateDto, loginMember);\n        newRoleAssignment = this.roleAssignmentService.create(newRoleAssignment);\n\n        return new ResponseEntity<>(convertToDto(newRoleAssignment), HttpStatus.CREATED);\n\n    }\n\n    @Operation(\n            summary = \"Delete role assignment\",\n            description = \"This endpoint will soft delete role assignment. In another words it will fill attributes related to deletion.\"\n    )\n    @Override\n    @ResponseStatus(HttpStatus.OK)\n    @PatchMapping(\"/role-assignments/{idRoleAssignment}\")\n    @PreAuthorize(\"@memberAuthorization.isRegistrarOfRoleOrOwner(authentication, @roleAssignmentService.getEntityById(#idRoleAssignment).getMember().getIdMember() )\")\n    public ResponseEntity<RoleAssignmentResponseDto> deletion(@Validated @RequestBody RecordableDeleteEntityCreateDto recordableDeleteEntityCreateDto,\n                                                              @Parameter(description = \"The id of the role assignment to delete\", example = \"{{idRoleAssignment}}\", required = true) @PathVariable Long idRoleAssignment,\n                                                              @AuthenticationPrincipal Member loginMember) {\n        return super.deletion(recordableDeleteEntityCreateDto, idRoleAssignment, loginMember);\n    }\n\n    @Override\n    protected RoleAssignment convertToEntity(RoleAssignmentCreateDto roleAssignmentCreateDto, Member loginMember) {\n\n        Role role = this.roleService.getByType(roleAssignmentCreateDto.getRole());\n\n        RoleAssignment newRoleAssignment = super.convertToEntity(roleAssignmentCreateDto, loginMember);\n        newRoleAssignment.setRole(role);\n\n        return newRoleAssignment;\n    }\n\n    @Override\n    protected AbstractMemberService<RoleAssignment> getService() {\n        return roleAssignmentService;\n    }\n\n    @Override\n    protected Class<RoleAssignment> getEntityClass() {\n        return RoleAssignment.class;\n    }\n\n    @Override\n    protected Class<RoleAssignmentResponseDto> getDtoClass() {\n        return RoleAssignmentResponseDto.class;\n    }\n}\n",
+        "middle_prediction": ";\n    @ApiResponse(responseCode = \"200\", content = @Content(schema =",
+        "exact_match": false,
+        "chrf": {
+            "score": 7.595314511692616,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 160.0,
+            "num_edits": 8,
+            "ref_length": 5.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.11764705882352941,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 1.0,
+            "length_ratio": 2.4285714285714284,
+            "translation_length": 17,
+            "reference_length": 7
+        },
+        "rouge": {
+            "rouge1": 0.0,
+            "rouge2": 0.0,
+            "rougeL": 0.0,
+            "rougeLsum": 0.0,
+            "avg": 0.0
+        },
+        "codebleu": {
+            "codebleu": 0.25,
+            "ngram_match_score": 0,
+            "weighted_ngram_match_score": 0,
+            "syntax_match_score": 0.0,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 4
+    },
+    {
+        "filename": "data/member/dto/FacultyCreateDto.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.dto;\n\nimport io.swagger.v3.oas.annotations.media.Schema;\nimport jakarta.validation.constraints.NotBlank;\nimport jakarta.validation.constraints.NotNull;\nimport jakarta.validation.constraints.Positive;\nimport jakarta.validation.constraints.Size;\nimport lombok.Data;\n\n@Data\npublic class FacultyCreateDto {\n\n    @Schema(example = \"1\")\n    @Positive(message = \"idUniversity must be a positive integer.\")\n    @NotNull(message = \"idUniversity cannot be blank.\")\n    private Long idUniversity;\n\n    @Schema(example = \"FIT {{randomChars}}\")\n    @NotBlank(message = \"name cannot be blank\")\n    @Size(max = 60, message = \"nameEn must be at most 60 characters long\")\n    @Size(max = 256, message = \"'${validatedValue}' cannot exceed {max} characters.\")\n    private String n",
+        "middle": "ame;\n\n    @Schema(example = \"FIT {{randomChars}}\")\n    @NotBlank(message = \"nameEn english cannot be ",
+        "suffix": "blank\")\n    @Size(max = 60, message = \"nameEn must be at most 60 characters long\")\n    @Size(max = 256, message = \"'${validatedValue}' cannot exceed {max} characters.\")\n    private String nameEn;\n\n\n}\n",
+        "middle_prediction": "ameEn;\n\n    @Schema(example = \"FIT {{randomChars}}\")\n    @NotNull(",
+        "exact_match": false,
+        "chrf": {
+            "score": 58.359117795816296,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 63.63636363636363,
+            "num_edits": 7,
+            "ref_length": 11.0
+        },
+        "bleu": {
+            "bleu": 0.581434649824162,
+            "precisions": [
+                0.8947368421052632,
+                0.8333333333333334,
+                0.8235294117647058,
+                0.8125
+            ],
+            "brevity_penalty": 0.6918258252705171,
+            "length_ratio": 0.7307692307692307,
+            "translation_length": 19,
+            "reference_length": 26
+        },
+        "rouge": {
+            "rouge1": 0.4705882352941177,
+            "rouge2": 0.4,
+            "rougeL": 0.4705882352941177,
+            "rougeLsum": 0.4705882352941177,
+            "avg": 0.4529411764705883
+        },
+        "codebleu": {
+            "codebleu": 0.5424356998806921,
+            "ngram_match_score": 0.22083358203177395,
+            "weighted_ngram_match_score": 0.23462350320528,
+            "syntax_match_score": 0.7142857142857143,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 8
+    },
+    {
+        "filename": "data/member/business/RoleAssignmentService.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.business;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.AbstractMemberService;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.exception.EntityAlreadyAssignedException;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.repository.MemberRecordJpaRepository;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.RoleAssignment;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.enums.BlockAccessTypeEnum;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.enums.RoleTypeEnum;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.repository.RoleAssignmentRepository;\nimport org.springframework.stereotype.Service;\n\nimport java.util.Arrays;\nimport java.util.List;\nimport java.util.stream.Collectors;\n\n@Service\npublic class RoleAssignmentService extends AbstractMemberService<RoleAssignment> {\n    private final RoleAssignmentRepository roleAssignmentRepository;\n\n    public RoleAssignmentService(RoleAssignmentRepository roleAssignmentRepository) {\n        this.roleAssignmentRepository = roleAssignmentRepository;\n\n    }\n\n    @Override\n    protected MemberRecordJpaRepository<RoleAssignment, Long> getRepository() {\n        return this.roleAssignmentRepository;\n    }\n\n    @Override\n    public RoleAssignment create(RoleAssignment e) {\n\n        if (this.roleAssignmentRepository.existsByMemberIdAndRoleIdAndDeletedAtIsNull(e.getMember().getId(), e.getRole().getId())) {\n            throw new EntityAlreadyAssignedException(\"Member already owns this role.\");\n        }\n\n        return super.create(e);\n    }\n\n\n    public List<RoleTypeEnum> getValidRolesForMemberByActiveEmail(String username) {\n\n\n        List<RoleTypeEnum> roles = roleAssignmentRepository.findValidRolesForMemberByActiveEmail(username,\n                BlockAccessTypeEnum.NETWORK_ACCESS,\n                BlockAccessTypeEnum.GYM_ACCESS);\n\n\n        if (roles.stream().anyMatch(role -> role.equals(RoleTypeEnum.ROLE_GOD_ADMIN))) {\n            roles.addAll(Arrays.stream(RoleTypeEnum.values())\n                    .collect(Collectors.toSet()));\n        }\n\n        if (roles.stream().anyMatch(role -> role.equals(RoleTypeEnum.ROLE_H",
+        "middle": "EAD_OF_NET_ADMINS))) {\n            r",
+        "suffix": "oles.add((RoleTypeEnum.ROLE_NET_ADMIN));\n        }\n\n        if (roles.stream().anyMatch(role -> role.equals(RoleTypeEnum.ROLE_HEAD_OF_GYM_ADMINS))) {\n            roles.add((RoleTypeEnum.ROLE_GYM_ADMIN));\n        }\n\n        if (roles.stream().anyMatch(role -> role.equals(RoleTypeEnum.ROLE_NET_ADMIN))) {\n            roles.add((RoleTypeEnum.ROLE_REGISTRAR));\n        }\n\n\n        return roles;\n\n    }\n\n\n}\n",
+        "middle_prediction": "OLID_OF_GYM_ADMINS))) {\n            roles.add((RoleTypeEnum.",
+        "exact_match": false,
+        "chrf": {
+            "score": 49.90139719318133,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 66.66666666666666,
+            "num_edits": 2,
+            "ref_length": 3.0
+        },
+        "bleu": {
+            "bleu": 0.3368020956312902,
+            "precisions": [
+                0.5,
+                0.4117647058823529,
+                0.3125,
+                0.2
+            ],
+            "brevity_penalty": 1.0,
+            "length_ratio": 1.5,
+            "translation_length": 18,
+            "reference_length": 12
+        },
+        "rouge": {
+            "rouge1": 0.3333333333333333,
+            "rouge2": 0.0,
+            "rougeL": 0.3333333333333333,
+            "rougeLsum": 0.3333333333333333,
+            "avg": 0.25
+        },
+        "codebleu": {
+            "codebleu": 0.3034054841616875,
+            "ngram_match_score": 0.11362193664674995,
+            "weighted_ngram_match_score": 0.10000000000000002,
+            "syntax_match_score": 0.0,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 8
+    },
+    {
+        "filename": "data/member/business/CountryService.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.business;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.AbstractService;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.exception.AttributeOfEntityTakenException;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.exception.MyEntityNotFoundException;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.repository.IdJpaRepository;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.Country;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.repository.CountryRepository;\nimport org.springframework.stereotype.Service;\n\n@Service\npublic class CountryService extends AbstractService<Country> {\n    private final CountryRepository countryRepository;\n\n    public CountryService(CountryRepository countryRepository) {\n        this.countryRepository = country",
+        "middle": "Repository;\n    }\n\n    @Override\n  ",
+        "suffix": "  protected IdJpaRepository<Country, Long> getRepository() {\n        return this.countryRepository;\n    }\n\n    public Country getByCountryShort(String shortName) {\n        return countryRepository.findByCountryShort(shortName)\n                .orElseThrow(() -> new MyEntityNotFoundException(\"Short country not found: \" + shortName));\n    }\n\n    public Iterable<Country> getAllSorted() {\n        return countryRepository.findAllSorted();\n    }\n\n    @Override\n    public Country create(Country country) {\n\n        if (countryRepository.existsByCountryShort(country.getCountryShort())) {\n            throw new AttributeOfEntityTakenException(\"Country already exist with this country_short attribute.\");\n        }\n\n        if (countryRepository.existsByCountryLong(country.getCountryLong())) {\n            throw new AttributeOfEntityTakenException(\"Country already exist with this country_long attribute.\");\n        }\n\n        return super.create(country);\n    }\n}\n",
+        "middle_prediction": "Repository;\n    }\n\n    public Country create(Country country) {\n\n        if (countryRepository.exists",
+        "exact_match": false,
+        "chrf": {
+            "score": 34.855002659809195,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 233.33333333333334,
+            "num_edits": 7,
+            "ref_length": 3.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.1875,
+                0.13333333333333333,
+                0.07142857142857142,
+                0.0
+            ],
+            "brevity_penalty": 1.0,
+            "length_ratio": 3.2,
+            "translation_length": 16,
+            "reference_length": 5
+        },
+        "rouge": {
+            "rouge1": 0.1818181818181818,
+            "rouge2": 0.0,
+            "rougeL": 0.1818181818181818,
+            "rougeLsum": 0.1818181818181818,
+            "avg": 0.13636363636363635
+        },
+        "codebleu": {
+            "codebleu": 0.3780466015143946,
+            "ngram_match_score": 0.050712153369465586,
+            "weighted_ngram_match_score": 0.21147425268811285,
+            "syntax_match_score": 0.25,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 6
+    },
+    {
+        "filename": "data/member/business/MemberCleanupScheduler.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.business;\n\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.Member;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.repository.MemberRepository;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\nimport org.springframework.scheduling.annotation.EnableScheduling;\nimport org.springframework.scheduling.annotation.Scheduled;\nimport org.springframework.stereotype.Component;\n\n@Component\n@EnableScheduling\npublic class MemberCleanupScheduler {\n    private static final Logger logger = LoggerF",
+        "middle": "actory.getLogger(MemberCleanupScheduler.class);\n    private final MemberService memberService;\n    private final MemberRepository memberRepository;\n\n    public MemberCleanupScheduler(MemberS",
+        "suffix": "ervice memberService, MemberRepository memberRepository) {\n        this.memberService = memberService;\n        this.memberRepository = memberRepository;\n    }\n\n    @Scheduled(cron = \"0 0 0 * * *\")\n    public void processDeleteRequests() {\n\n        logger.info(\"Member cleanup\");\n\n        Iterable<Member> membersToDelete = memberService.getMembersToDelete();\n\n        memberRepository.deleteAll(membersToDelete);\n    }\n}\n",
+        "middle_prediction": "unction();\n\n    public static final MemberService memberService = MemberService();\n    public static final MemberRepository",
+        "exact_match": false,
+        "chrf": {
+            "score": 41.09010680118546,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 72.72727272727273,
+            "num_edits": 8,
+            "ref_length": 11.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.6111111111111112,
+                0.29411764705882354,
+                0.0625,
+                0.0
+            ],
+            "brevity_penalty": 0.7574651283969664,
+            "length_ratio": 0.782608695652174,
+            "translation_length": 18,
+            "reference_length": 23
+        },
+        "rouge": {
+            "rouge1": 0.4615384615384615,
+            "rouge2": 0.25,
+            "rougeL": 0.3846153846153846,
+            "rougeLsum": 0.4615384615384615,
+            "avg": 0.38942307692307687
+        },
+        "codebleu": {
+            "codebleu": 0.3290843033025581,
+            "ngram_match_score": 0.053863663688318665,
+            "weighted_ngram_match_score": 0.06247354952191367,
+            "syntax_match_score": 0.2,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 4
+    },
+    {
+        "filename": "data/member/domain/Country.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.domain;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.domain.Identifiable;\nimport jakarta.persistence.*;\nimport lombok.Data;\n\nimport java.io.Serial;\nimport java.io.Serializable;\n\n@Data\n@Entity\n@Table(name = \"country\", uniqueConstraints =\n        {\n                @UniqueConstraint(name = \"unique_constraint_country_short\", columnNames = \"country_short\"),\n                @UniqueConstraint(name = \"unique_constraint_country_long\", columnNames = \"country_long\")\n        })\npublic class Country implements Identifiable, Serializable {\n\n    @Serial\n    private static final long serialVersionUID = 1L;\n\n    @Id\n    @GeneratedValue(strategy = GenerationType.SEQUENCE)\n    @Column(name = \"id_country\")\n    private Long idCountry;\n\n    @Column(name = \"country_short\", nullable = false, le",
+        "middle": "ngth = 3)\n    private String countryShort;\n\n    @Column(name = \"country_long\", nullable = false, length = 35)\n    private String countryLong;\n\n    @Column(name = \"priority\", nullable = false,",
+        "suffix": " columnDefinition = \"int default 100\")\n    private int priority = 100;\n\n    public Country(String countryShort, String countryLong, int priority) {\n        this.countryShort = countryShort;\n        this.countryLong = countryLong;\n        this.priority = priority;\n    }\n\n    public Country(String countryShort, String countryLong) {\n        this.countryShort = countryShort;\n        this.countryLong = countryLong;\n    }\n\n    public Country() {\n    }\n\n\n    @Override\n    public Long getId() {\n        return this.idCountry;\n    }\n\n}\n",
+        "middle_prediction": "ngth = 100)\n    private Long countryShort;\n    private Long countryLong;",
+        "exact_match": false,
+        "chrf": {
+            "score": 28.789383735463907,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 75.0,
+            "num_edits": 18,
+            "ref_length": 24.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.75,
+                0.36363636363636365,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 0.06948345122280151,
+            "length_ratio": 0.2727272727272727,
+            "translation_length": 12,
+            "reference_length": 44
+        },
+        "rouge": {
+            "rouge1": 0.4137931034482759,
+            "rouge2": 0.0,
+            "rougeL": 0.3448275862068965,
+            "rougeLsum": 0.4137931034482759,
+            "avg": 0.2931034482758621
+        },
+        "codebleu": {
+            "codebleu": 0.15093154859210275,
+            "ngram_match_score": 0.01260573663453948,
+            "weighted_ngram_match_score": 0.02533098404966103,
+            "syntax_match_score": 0.3157894736842105,
+            "dataflow_match_score": 0.25
+        },
+        "manual_evaluation": 5
+    },
+    {
+        "filename": "data/member/dto/RoomAccommodationCreateDto.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.dto;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.dto.MemberCreateDto;\nimport io.swagger.v3.oas.annotations.media.Schema;\nimport jakarta.validation.constraints.NotNull;\nimport jakarta.validation.constraints.Positive;\nimport lombok.Data;\nimport lombok.EqualsAndHashCode;\n\n@EqualsAndHashCode(callSuper = true)\n@Data\npub",
+        "middle": "lic class RoomAccommodationCreateDto extends MemberCreateDto {\n\n\n    @Schema(example = \"5\")\n    @Positive(mes",
+        "suffix": "sage = \"idRoom must be a positive integer.\")\n    @NotNull(message = \"idRoom cannot be blank.\")\n    private Long idRoom;\n}\n",
+        "middle_prediction": "s:\n    idRoom = String;\n    message = \"idRoom must be a positive integer.\"",
+        "exact_match": false,
+        "chrf": {
+            "score": 17.060100038427436,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 120.0,
+            "num_edits": 12,
+            "ref_length": 10.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.17647058823529413,
+                0.0625,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 0.8890097654027757,
+            "length_ratio": 0.8947368421052632,
+            "translation_length": 17,
+            "reference_length": 19
+        },
+        "rouge": {
+            "rouge1": 0.10000000000000002,
+            "rouge2": 0.0,
+            "rougeL": 0.10000000000000002,
+            "rougeLsum": 0.10000000000000002,
+            "avg": 0.07500000000000001
+        },
+        "codebleu": {
+            "codebleu": 0.2865913455952255,
+            "ngram_match_score": 0.017033186037639283,
+            "weighted_ngram_match_score": 0.01822108523215156,
+            "syntax_match_score": 0.1111111111111111,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 2
+    },
+    {
+        "filename": "data/member/controller/AuthController.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.controller;\n\n\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.dto.AuthResponseDto;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.dto.LoginDto;\nimport cz.cvut.fit.kvasvojt.sinis.security.CustomUserDetailsService;\nimport cz.cvut.fit.kvasvojt.sinis.security.JWTGenerator;\nimport io.swagger.v3.oas.annotations.Operation;\nimport io.swagger.v3.oas.annotations.tags.Tag;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.http.HttpStatus;\nimport org.springframework.http.MediaType;\nimport org.springframework.http.ResponseEntity;\nimport org.springframework.security.authentication.AuthenticationManager;\nimport org.springframework.security.authentication.UsernamePasswordAuthenticationToken;\nimport org.springframework.security.core.Authentication;\nimport org.springframework.security.core.context.SecurityContextHolder;\nimport org.springframework.validation.annotation.Validated;\nimport org.springframework.web.bind.annotation.*;\n\n@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)\n@Tag(name = \"Member\")\n@RestController\npublic class AuthController {\n\n    private final AuthenticationManager authenticationManager;\n\n    private final JWTGenerator jwtGenerator;\n    private final CustomUserDetailsService customUserDetailsService;\n\n    @Autowired\n    public AuthController(AuthenticationManager authenticationManager, JWTGenerator jwtGenerator, CustomUserDetailsService customUserDetailsService) {\n        this.authenticationManager = authenticationManager;\n        this.jwtGenerator = jwtGenerator;\n        this.customUserDetailsService = customUserDetailsService;\n    }\n\n    @Operation(\n            summary = \"Login member\",\n            description = \"This endpoint login existing member.\",\n            operationId = \"login\"\n    )\n    @ResponseStatus(HttpStatus.OK)\n    @PostMapping(\"/login\")\n    public ResponseEntity<AuthResponseDto> login(@Validated @RequestBody LoginDto loginDto) {\n        Authentication authentication = authenticationManager.authenticate(\n                new UsernamePasswordAuthenticationToken(\n                     ",
+        "middle": "   loginDto.getUsername(),\n                        loginDto.getPassword()));\n        SecurityContextHolder.getContext().setAuthentication(authenticat",
+        "suffix": "ion);\n\n\n        String token = jwtGenerator.generateToken(authentication, customUserDetailsService);\n        return new ResponseEntity<>(new AuthResponseDto(token), HttpStatus.OK);\n    }\n\n}\n",
+        "middle_prediction": "   username = \"username\",\n                      password = \"<PASSWORD>\"\n                  ),\n                customUserDetailsService.getUser",
+        "exact_match": false,
+        "chrf": {
+            "score": 19.386136287751608,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 266.66666666666663,
+            "num_edits": 8,
+            "ref_length": 3.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.16666666666666666,
+                0.058823529411764705,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 0.7574651283969664,
+            "length_ratio": 0.782608695652174,
+            "translation_length": 18,
+            "reference_length": 23
+        },
+        "rouge": {
+            "rouge1": 0.0,
+            "rouge2": 0.0,
+            "rougeL": 0.0,
+            "rougeLsum": 0.0,
+            "avg": 0.0
+        },
+        "codebleu": {
+            "codebleu": 0.125,
+            "ngram_match_score": 0,
+            "weighted_ngram_match_score": 0,
+            "syntax_match_score": 0.0,
+            "dataflow_match_score": 0.5
+        },
+        "manual_evaluation": 2
+    },
+    {
+        "filename": "data/member/business/MemberService.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.business;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.AbstractService;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.exception.AttributeOfEntityTakenException;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.exception.EntityAlreadyDeletedException;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.exception.MyEntityNotFoundException;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.repository.IdJpaRepository;\nimport cz.cvut.fit.kvasvojt.sinis.modules.email_sinis_alias.business.EmailSinisAliasService;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.business.exception.MemberCannotCheckIdentityException;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.Address;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.Member;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.RoomAccommodation;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.repository.MemberRepository;\nimport org.springframework.data.domain.Page;\nimport org.springframework.data.domain.Pageable;\nimport org.springframework.security.crypto.password.PasswordEncoder;\nimport org.springframework.stereotype.Service;\nimport org.springframework.transaction.annotation.Transactional;\n\nimport java.time.LocalDate;\nimport java.time.LocalDateTime;\nimport java.util.Optional;\n\n@Service\npublic class MemberService extends AbstractService<Member> {\n\n    private final MemberRepository memberRepository;\n    private final EmailSinisAliasService emailSinisAliasService;\n    private final LanguageService languageService;\n    private final AddressService addressService;\n    private final RoomAccommodationService roomAccommodationService;\n\n    private final PasswordEncoder passwordEncoder;\n\n    public MemberService(MemberRepository memberRepository, EmailSinisAliasService emailSinisAliasService, LanguageService languageService, AddressService addressService, RoomAccommodationService roomAccommodationService, PasswordEncoder passwordEncoder) {\n        this.memberRepository = memberRepository;\n        this.emailSinisAliasService = emailSinisAliasService;\n        this.languageService = languageService;\n        this.addressService = addressService;\n        this.roomAccommodationService = roomAccommodationService;\n        this.passwordEncoder = passwordEncoder;\n    }\n\n\n    public boolean existsByActiveEmail(String email) {\n        return this.memberRepository.existsByActiveEmail(email);\n    }\n\n    public Optional<Member> getByActiveEmail(String email) {\n        return this.memberRepository.findValidMemberByActiveEmail(email);\n    }\n\n    @Override\n    protected IdJpaRepository<Member, Long> getRepository() {\n        return this.memberRepository;\n    }\n\n\n    public Page<Member> getAllMembersIdentityCheckAndDeletionCheck(Pageable pageable, boolean isIdentityCheck, boolean isDeletionRequested) {\n        if (isDeletionRequested) {\n            return memberRepository.findAllMembersIdentityCheckAndDeleted(pageable, isIdentityCheck);\n        } else {\n            return memberRepository.findAllMembersIdentityCheckAndNotDeleted(pageable, isIdentityCheck);\n\n        }\n    }\n\n    public Member deleteRequest(Member login, String comment, Member member) {\n\n        if (member.isDeleted()) {\n            throw new EntityAlreadyDeletedException();\n        }\n\n        LocalDateTime currentDate = LocalDate.now().atStartOfDay();\n        LocalDateTime willBeDeleteAt = currentDate.plusYears(1).withMonth(10).withDayOfMonth(1);\n\n        member.deleteRequest(login, comment, willBeDeleteA",
+        "middle": "t);\n        member = memberRepository.save(member);\n\n        return member;\n    }\n\n    publi",
+        "suffix": "c Member changePassword(String oldPassword, String newPassword, Member updateMember) {\n\n        if (oldPassword != null && !passwordEncoder.matches(oldPassword, updateMember.getPassword())) {\n            throw new IllegalArgumentException(\"Old password is incorrect.\");\n        }\n\n        newPassword = passwordEncoder.encode(newPassword);\n        updateMember.setPassword(newPassword);\n        updateMember = memberRepository.save(updateMember);\n\n        return updateMember;\n    }\n\n    public Iterable<Member> getMembersToDelete() {\n        return memberRepository.findMembersToDelete();\n    }\n\n    public Member getValidEntityById(Long idMember) {\n        return memberRepository.findByIdAndDeletionRequestAtIsNull(idMember)\n                .orElseThrow(() -> new MyEntityNotFoundException(\"Member with id = \" + idMember + \" not found, because does not exist or was deleted.\"));\n\n    }\n\n    public Member getValidAndCheckMemberById(Long idMember) {\n        return memberRepository.findValidAndCheckMemberById(idMember)\n                .orElseThrow(() -> new MyEntityNotFoundException(\"Member with id = \" + idMember + \" not found, because does not exist or was deleted or does not have identity check.\"));\n\n    }\n\n    @Transactional\n    @Override\n    public Member create(Member member) {\n\n        if (memberRepository.existsByActiveEmail(member.getActiveEmail())) {\n            throw new AttributeOfEntityTakenException(\"Member already exist with this email address.\");\n        }\n\n        member = super.create(member);\n        emailSinisAliasService.createDefault(member);\n\n        if (member.isIdentityCheck() && !hasMemberAllRequiredFieldsFilledOut(member)) {\n            throw new MemberCannotCheckIdentityException(\"Cannot check identity, some fields are not filled out.\");\n        }\n\n        languageService.createDefault(member);\n\n        return member;\n    }\n\n\n    @Override\n    public Member update(Member member) {\n\n        if (member.isIdentityCheck() && !hasMemberAllRequiredFieldsFilledOut(member)) {\n            throw new MemberCannotCheckIdentityException(\"Cannot check identity, some fields are not filled out.\");\n        }\n\n        return super.update(member);\n    }\n\n    private boolean hasMemberAllRequiredFieldsFilledOut(Member member) {\n\n        Iterable<Address> addressList = addressService.getByMemberId(member.getIdMember());\n        Iterable<RoomAccommodation> roomAccommodationList = roomAccommodationService.getByMemberId(member.getIdMember());\n\n        return addressList != null && addressList.iterator().hasNext() &&\n                roomAccommodationList != null && roomAccommodationList.iterator().hasNext();\n\n    }\n\n\n}\n\n",
+        "middle_prediction": "ndMember);\n\n        return memberRepository.deleteRequest(login, comment, willBeDeleteMember);",
+        "exact_match": false,
+        "chrf": {
+            "score": 53.09477337291175,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 87.5,
+            "num_edits": 7,
+            "ref_length": 8.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.5333333333333333,
+                0.2857142857142857,
+                0.07692307692307693,
+                0.0
+            ],
+            "brevity_penalty": 0.8751733190429475,
+            "length_ratio": 0.8823529411764706,
+            "translation_length": 15,
+            "reference_length": 17
+        },
+        "rouge": {
+            "rouge1": 0.26666666666666666,
+            "rouge2": 0.0,
+            "rougeL": 0.13333333333333333,
+            "rougeLsum": 0.26666666666666666,
+            "avg": 0.16666666666666669
+        },
+        "codebleu": {
+            "codebleu": 0.3417545042016483,
+            "ngram_match_score": 0.029486824119076216,
+            "weighted_ngram_match_score": 0.037531192687516986,
+            "syntax_match_score": 0.3,
+            "dataflow_match_score": 0.0
+        },
+        "manual_evaluation": 5
+    },
+    {
+        "filename": "data/member/domain/enums/RoleTypeEnum.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.domain.enums;\n\nimport lombok.Getter;\n\n@Getter\npublic enum RoleTypeEnum {\n\n    ROLE_MEMBER(\"ROLE_MEMBER\"),\n    ROLE_MULTI_MEDIA(\"ROLE_MULTI_MEDIA\"),\n    ROLE_CHAIR_MAN(\"ROLE_CHAIR_MAN\"),\n    ROLE_NET_ADMIN(\"ROLE_NET_ADMIN\"),\n    ROLE_GYM_ADMIN(\"ROLE_GYM_ADMIN\"),\n    ROLE_HEAD_OF_NET_ADMINS(\"ROLE_HEAD_OF_NE",
+        "middle": "T_ADMINS\"),\n    ROLE_HEAD_OF_GYM_AD",
+        "suffix": "MINS(\"ROLE_HEAD_OF_GYM_ADMINS\"),\n    ROLE_GOD_ADMIN(\"ROLE_GOD_ADMIN\"),\n    ROLE_ACCOUNTANT(\"ROLE_ACCOUNTANT\"),\n    ROLE_STUFF_ADMIN(\"ROLE_STUFF_ADMIN\"),\n    ROLE_REGISTRAR(\"ROLE_REGISTRAR\");\n\n    private final String value;\n\n    RoleTypeEnum(String value) {\n        this.value = value;\n    }\n}\n",
+        "middle_prediction": "MS\"),\n    ROLE_HEAD_OF_GYM_ADMINS(\"ROLE_HEAD_OF",
+        "exact_match": false,
+        "chrf": {
+            "score": 81.64237894470307,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 100.0,
+            "num_edits": 2,
+            "ref_length": 2.0
+        },
+        "bleu": {
+            "bleu": 0.5454951299940093,
+            "precisions": [
+                0.65,
+                0.5789473684210527,
+                0.5,
+                0.47058823529411764
+            ],
+            "brevity_penalty": 1.0,
+            "length_ratio": 1.3333333333333333,
+            "translation_length": 20,
+            "reference_length": 15
+        },
+        "rouge": {
+            "rouge1": 0.6250000000000001,
+            "rouge2": 0.5714285714285715,
+            "rougeL": 0.5,
+            "rougeLsum": 0.6250000000000001,
+            "avg": 0.5803571428571429
+        },
+        "codebleu": {
+            "codebleu": 0.25,
+            "ngram_match_score": 0,
+            "weighted_ngram_match_score": 0,
+            "syntax_match_score": 0.0,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 7
+    },
+    {
+        "filename": "data/member/dto/ChangePasswordPatchDto.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.dto;\n\nimport io.swagger.v3.oas.annotations.media.Schema;\nimport jakarta.validation.constraints.NotBlank;\nimport jakarta.validation.constraints.NotNull;\nimport jakarta.validation.constraints.Pattern;\nimport jakarta.validation.constraints.Positive;\nimport lombok.Data;\n\n@Data\npublic class ChangePasswordPatchDto {\n\n    @Schema(example = \"7227\")\n    @Positive(message = \"idMember must be a positive integer.\")\n    @NotNull(message = \"idMember cannot be blank.\")\n    private Long idMember;\n\n    @Schema(example = \"Aa123456\")\n    @Pattern(regexp = \"^(?=.*[\\\\d])(?=.*[a-z])(?=.*[A-Z])(?=\\\\S+$).{8,}$|^$\",\n            message = \"Password must contain at least one digit, one lowercase letter, one uppercase letter, and be at least 8 characters long, or it can be empty.\")\n    pr",
+        "middle": "ivate String oldPassword;\n\n    @Schema(example = \"Aa1234567\")\n    @Pattern(regexp = \"^(?=.*[\\\\d])(?=.*[a-z])(?=.*[A-Z])(?=\\\\S+",
+        "suffix": "$).{8,}$\",\n            message = \"Password must contain at least one digit, one lowercase letter, one uppercase letter, and be at least 8 characters long.\")\n    @NotBlank(message = \"New password cannot be blank.\")\n    private String newPassword;\n}\n",
+        "middle_prediction": "int String password;\n\n    @Schema(example = \"7227\")\n    @Positive(",
+        "exact_match": false,
+        "chrf": {
+            "score": 31.82925221644236,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 66.66666666666666,
+            "num_edits": 6,
+            "ref_length": 9.0
+        },
+        "bleu": {
+            "bleu": 0.03933813410361554,
+            "precisions": [
+                0.75,
+                0.5333333333333333,
+                0.42857142857142855,
+                0.3076923076923077
+            ],
+            "brevity_penalty": 0.0820849986238988,
+            "length_ratio": 0.2857142857142857,
+            "translation_length": 16,
+            "reference_length": 56
+        },
+        "rouge": {
+            "rouge1": 0.2857142857142857,
+            "rouge2": 0.10526315789473684,
+            "rougeL": 0.2857142857142857,
+            "rougeLsum": 0.2857142857142857,
+            "avg": 0.24060150375939848
+        },
+        "codebleu": {
+            "codebleu": 0.4452205577481391,
+            "ngram_match_score": 0.05809334108283256,
+            "weighted_ngram_match_score": 0.056122223243057295,
+            "syntax_match_score": 0.6666666666666666,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 2
+    },
+    {
+        "filename": "data/member/business/RoomAccommodationService.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.business;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.AbstractMemberService;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.exception.EntityAlreadyAssignedException;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.repository.MemberRecordJpaRepository;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.Ro",
+        "middle": "omAccommodation;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.repository.RoomAccommodationRepository;\nimport org.springframework.stereotype.Service;\n\n@Service\npublic class RoomAccommodation",
+        "suffix": "Service extends AbstractMemberService<RoomAccommodation> {\n\n    private final RoomAccommodationRepository roomAccommodationRepository;\n\n    public RoomAccommodationService(RoomAccommodationRepository roomAccommodationRepository) {\n        this.roomAccommodationRepository = roomAccommodationRepository;\n    }\n\n    @Override\n    protected MemberRecordJpaRepository<RoomAccommodation, Long> getRepository() {\n        return this.roomAccommodationRepository;\n    }\n\n    @Override\n    public RoomAccommodation create(RoomAccommodation roomAccommodation) {\n\n        if (roomAccommodationRepository.existsByMemberIdAndDeletedAtIsNull(roomAccommodation.getMember().getIdMember())) {\n            throw new EntityAlreadyAssignedException(\"Member with id = \" + roomAccommodation.getMember().getIdMember() + \" already has room.\");\n        }\n\n        return super.create(roomAccommodation);\n    }\n}\n",
+        "middle_prediction": "tAccommodation;\nimport cz.cvut.fit.kvasvojt.sin",
+        "exact_match": false,
+        "chrf": {
+            "score": 27.09968383247977,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 88.88888888888889,
+            "num_edits": 8,
+            "ref_length": 9.0
+        },
+        "bleu": {
+            "bleu": 0.1187150465034596,
+            "precisions": [
+                0.8333333333333334,
+                0.8181818181818182,
+                0.8,
+                0.7777777777777778
+            ],
+            "brevity_penalty": 0.14709646739297685,
+            "length_ratio": 0.34285714285714286,
+            "translation_length": 12,
+            "reference_length": 35
+        },
+        "rouge": {
+            "rouge1": 0.37037037037037035,
+            "rouge2": 0.32,
+            "rougeL": 0.37037037037037035,
+            "rougeLsum": 0.37037037037037035,
+            "avg": 0.35777777777777775
+        },
+        "codebleu": {
+            "codebleu": 0.37189942294063566,
+            "ngram_match_score": 0.015377056977980369,
+            "weighted_ngram_match_score": 0.02777619034011792,
+            "syntax_match_score": 0.4444444444444444,
+            "dataflow_match_score": 0.0
+        },
+        "manual_evaluation": 6
+    },
+    {
+        "filename": "data/member/business/LanguageService.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.business;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.AbstractMemberService;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.repository.MemberRecordJpaRepository;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.Language;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.",
+        "middle": "domain.Member;\nimport cz.cvu",
+        "suffix": "t.fit.kvasvojt.sinis.modules.member.repository.LanguageRepository;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.stereotype.Service;\n\n@Service\npublic class LanguageService extends AbstractMemberService<Language> {\n    private final LanguageRepository languageRepository;\n\n    @Autowired\n    public LanguageService(LanguageRepository languageRepository) {\n        this.languageRepository = languageRepository;\n    }\n\n    @Override\n    protected MemberRecordJpaRepository<Language, Long> getRepository() {\n        return this.languageRepository;\n    }\n\n    public Language createDefault(Member member) {\n\n\n        Language language = new Language();\n        language.setMember(member);\n        language.setCreatedComment(\"Default created by system.\");\n        return create(language);\n    }\n}\n",
+        "middle_prediction": "repository.LanguageRepository;\nimport org.springframework.beans.factory.annotation.Autowired;\n",
+        "exact_match": false,
+        "chrf": {
+            "score": 19.445541362695497,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 66.66666666666666,
+            "num_edits": 2,
+            "ref_length": 3.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.23529411764705882,
+                0.0625,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 1.0,
+            "length_ratio": 2.125,
+            "translation_length": 17,
+            "reference_length": 8
+        },
+        "rouge": {
+            "rouge1": 0.14285714285714285,
+            "rouge2": 0.0,
+            "rougeL": 0.14285714285714285,
+            "rougeLsum": 0.14285714285714285,
+            "avg": 0.10714285714285714
+        },
+        "codebleu": {
+            "codebleu": 0.4627731867057016,
+            "ngram_match_score": 0.11362193664674995,
+            "weighted_ngram_match_score": 0.13747081017605653,
+            "syntax_match_score": 0.6,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 6
+    },
+    {
+        "filename": "data/member/business/AssociateFacultyService.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.business;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.AbstractMemberService;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.repository.MemberRecordJpaRepository;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.AssociateFaculty;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.repository.AssociateFacultyRepository;\nimport org.springframework.beans.factory.annotation.Autowired",
+        "middle": ";\nimport org.springframework.stereotype.Service;\n\n@Service\npublic class AssociateFacultyService extends AbstractMemberService<AssociateFaculty> {\n    private fi",
+        "suffix": "nal AssociateFacultyRepository associateFacultyRepository;\n\n    @Autowired\n    public AssociateFacultyService(AssociateFacultyRepository associateFacultyRepository) {\n        this.associateFacultyRepository = associateFacultyRepository;\n    }\n\n    @Override\n    protected MemberRecordJpaRepository<AssociateFaculty, Long> getRepository() {\n        return this.associateFacultyRepository;\n    }\n}\n",
+        "middle_prediction": ";\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework",
+        "exact_match": false,
+        "chrf": {
+            "score": 25.618610907647277,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 83.33333333333334,
+            "num_edits": 10,
+            "ref_length": 12.0
+        },
+        "bleu": {
+            "bleu": 0.21537227035630457,
+            "precisions": [
+                0.4444444444444444,
+                0.29411764705882354,
+                0.25,
+                0.2
+            ],
+            "brevity_penalty": 0.7574651283969664,
+            "length_ratio": 0.782608695652174,
+            "translation_length": 18,
+            "reference_length": 23
+        },
+        "rouge": {
+            "rouge1": 0.25,
+            "rouge2": 0.18181818181818185,
+            "rougeL": 0.25,
+            "rougeLsum": 0.25,
+            "avg": 0.23295454545454547
+        },
+        "codebleu": {
+            "codebleu": 0.3287790144377698,
+            "ngram_match_score": 0.028018824614254093,
+            "weighted_ngram_match_score": 0.03709723313682506,
+            "syntax_match_score": 0.25,
+            "dataflow_match_score": 1.0
+        },
+        "manual_evaluation": 2
+    },
+    {
+        "filename": "data/member/dto/AddressCreateDto.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.dto;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.dto.MemberCreateDto;\nimport io.swagger.v3.oas.annotations.media.Schema;\nimport jakarta.validation.constraints.NotBlank;\nimport jakarta.validation.constraints.Positive;\nimport jakarta.validation.constraints.Size;\nimport lombok.Data;\nimport lombok.EqualsAndHashCode;\n\n@EqualsAndHashCode(callSuper = true)\n@Data\npublic class AddressCreateDto extends MemberCre",
+        "middle": "ateDto {\n\n    @Schema(example = \"CZE\")\n    @Size(max = 3, message = \"CountryShort must be at most 3 characters long\")\n    @NotBlank(message = \"Country cannot be blank.\")\n    ",
+        "suffix": "@Size(max = 256, message = \"'${validatedValue}' cannot exceed {max} characters.\")\n    private String countryShort;\n\n    @Schema(example = \"Kol\u00edn\")\n    @NotBlank(message = \"City cannot be blank.\")\n    @Size(max = 256, message = \"'${validatedValue}' cannot exceed {max} characters.\")\n    private String city;\n\n    @Schema(example = \"Pra\u017esk\u00e1\")\n    @NotBlank(message = \"Street cannot be blank.\")\n    @Size(max = 256, message = \"'${validatedValue}' cannot exceed {max} characters.\")\n    private String street;\n\n    @Schema(example = \"10\")\n    @Positive(message = \"Street number must be a positive integer.\")\n    private int streetNumber;\n\n}\n",
+        "middle_prediction": "ateDto {\n    public String name;\n    public String street;\n    public String city;\n    public",
+        "exact_match": false,
+        "chrf": {
+            "score": 10.798415112794856,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 91.66666666666666,
+            "num_edits": 22,
+            "ref_length": 24.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.13333333333333333,
+                0.07142857142857142,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 0.14466517663899503,
+            "length_ratio": 0.3409090909090909,
+            "translation_length": 15,
+            "reference_length": 44
+        },
+        "rouge": {
+            "rouge1": 0.060606060606060615,
+            "rouge2": 0.0,
+            "rougeL": 0.060606060606060615,
+            "rougeLsum": 0.060606060606060615,
+            "avg": 0.04545454545454546
+        },
+        "codebleu": {
+            "codebleu": 0.2574964483413518,
+            "ngram_match_score": 0.01325131283480393,
+            "weighted_ngram_match_score": 0.016734480530603443,
+            "syntax_match_score": 0.0,
+            "dataflow_match_score": 0.0
+        },
+        "manual_evaluation": 7
+    },
+    {
+        "filename": "data/member/business/AddressService.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.business;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.AbstractMemberService;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.repository.MemberRecordJpaRepository;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.Address;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.repository.AddressRepository;\nimport org.springframework.stereotype.Service;\n\n@Service\npublic class AddressService extends AbstractMemberService<Address> {\n    private f",
+        "middle": "inal AddressRepository addressRepository;\n\n    public AddressService(AddressRepository addressRepository) {\n        this.addressRepository = addressRepo",
+        "suffix": "sitory;\n    }\n\n    @Override\n    protected MemberRecordJpaRepository<Address, Long> getRepository() {\n        return this.addressRepository;\n    }\n}\n",
+        "middle_prediction": "rom AddressRepository;\n    private MemberRecordjpaRepository<Address, Long> getRepository() {\n       ",
+        "exact_match": false,
+        "chrf": {
+            "score": 34.69435010414011,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 90.0,
+            "num_edits": 9,
+            "ref_length": 10.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.35714285714285715,
+                0.07692307692307693,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 0.8668778997501817,
+            "length_ratio": 0.875,
+            "translation_length": 14,
+            "reference_length": 16
+        },
+        "rouge": {
+            "rouge1": 0.11764705882352941,
+            "rouge2": 0.0,
+            "rougeL": 0.11764705882352941,
+            "rougeLsum": 0.11764705882352941,
+            "avg": 0.08823529411764705
+        },
+        "codebleu": {
+            "codebleu": 0.31578573594490833,
+            "ngram_match_score": 0.02151810250197126,
+            "weighted_ngram_match_score": 0.01940261905543995,
+            "syntax_match_score": 0.2222222222222222,
+            "dataflow_match_score": 0.0
+        },
+        "manual_evaluation": 2
+    },
+    {
+        "filename": "data/member/dto/AddressResponseDto.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.dto;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.dto.RecordableDeleteEntityAndMemberResponseDto;\nimport io.swagger.v3.oas.annotations.media.Schema;\nimport lombok.Data;\nimport lombok.EqualsAndHashCode;\n\n@EqualsAndHashCode(callSuper = true)\n@Data\npublic class ",
+        "middle": "AddressResponseDto extends RecordableDeleteEntityAndMemberResponseDto {\n\n    @Schema(example = \"95",
+        "suffix": "3\")\n    private Long idAddress;\n    private CountryDto country;\n    private MemberResponseDto member;\n\n    @Schema(example = \"Kol\u00edn\")\n    private String city;\n\n    @Schema(example = \"Pra\u017esk\u00e1\")\n    private String street;\n\n    @Schema(example = \"10\")\n    private int streetNumber;\n}\n",
+        "middle_prediction": "RecordableDeleteEntityAndMemberResponseDto {\n    private RecordableDeleteEntityAndMemberResponseDto record",
+        "exact_match": false,
+        "chrf": {
+            "score": 60.95596924930794,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 71.42857142857143,
+            "num_edits": 5,
+            "ref_length": 7.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.4,
+                0.25,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 0.301194211912202,
+            "length_ratio": 0.45454545454545453,
+            "translation_length": 5,
+            "reference_length": 11
+        },
+        "rouge": {
+            "rouge1": 0.2,
+            "rouge2": 0.0,
+            "rougeL": 0.2,
+            "rougeLsum": 0.2,
+            "avg": 0.15000000000000002
+        },
+        "codebleu": {
+            "codebleu": 0.28463823063122073,
+            "ngram_match_score": 0.07616306180370792,
+            "weighted_ngram_match_score": 0.06238986072117501,
+            "syntax_match_score": 0.0,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 7
+    },
+    {
+        "filename": "data/member/dto/AuthResponseDto.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.dto;\n\nimport io.swagger.v3.oas.annotations.media.Schema;\nimport lombok.Data;\n\n@Data\npublic class AuthResponseDto {\n\n    @Schema(example = \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXNAc3lzLnN5cyIsImlhdCI6MTcxMzU1MDg5NSwiZXhwIjoxNzEzNTUyNjk1fQ.A4iHlPx00Sa1DThh6j-ndEQA1U0e1OOJ01X0OpDbEdLpOlkPjnLzWuryv7V7-nt",
+        "middle": "lGsscMikchzRF8PPqOHzSYA\")\n    private String accessToken;\n\n    @Schema(example = \"Bearer \")\n    private String tokenType = \"Bearer \";\n\n    public AuthRe",
+        "suffix": "sponseDto(String accessToken) {\n        this.accessToken = accessToken;\n    }\n\n}\n",
+        "middle_prediction": "1-1-1-1-1-1-1-1-1-1-",
+        "exact_match": false,
+        "chrf": {
+            "score": 0.0,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 100.0,
+            "num_edits": 16,
+            "ref_length": 16.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 0.740818220681718,
+            "length_ratio": 0.7692307692307693,
+            "translation_length": 20,
+            "reference_length": 26
+        },
+        "rouge": {
+            "rouge1": 0.0,
+            "rouge2": 0.0,
+            "rougeL": 0.0,
+            "rougeLsum": 0.0,
+            "avg": 0.0
+        },
+        "codebleu": {
+            "codebleu": 0.25,
+            "ngram_match_score": 0,
+            "weighted_ngram_match_score": 0,
+            "syntax_match_score": 0.0,
+            "dataflow_match_score": 0.0
+        },
+        "manual_evaluation": 0
+    },
+    {
+        "filename": "data/member/dto/UniversityResponseDto.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.dto;\n\nimport io.swagger.v3.oas.annotations.media.Schema;\nimport jakarta.validation.constraints.NotBlank;\nimport lombok.Data;\n\n@Data\npublic class UniversityResponseDto {\n\n    @Schema(example = \"66\")\n    private Long idUniversity;\n\n    @Schema(example = \"CVUT {{$ran",
+        "middle": "domCity}}\")\n    @NotBlank(message = \"name cannot be blank\")\n    private String name;\n\n    @Schema(example = \"CVUT {{$randomCity}}\")\n   ",
+        "suffix": " @NotBlank(message = \"nameEn cannot be blank\")\n    private String nameEn;\n\n}\n",
+        "middle_prediction": "d}}\")\n    private String nameEn;\n\n    @Schema(example = \"CVUT {{$name",
+        "exact_match": false,
+        "chrf": {
+            "score": 45.6759363904411,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 64.28571428571429,
+            "num_edits": 9,
+            "ref_length": 14.0
+        },
+        "bleu": {
+            "bleu": 0.33305421771136934,
+            "precisions": [
+                0.9,
+                0.7894736842105263,
+                0.7222222222222222,
+                0.5882352941176471
+            ],
+            "brevity_penalty": 0.4493289641172217,
+            "length_ratio": 0.5555555555555556,
+            "translation_length": 20,
+            "reference_length": 36
+        },
+        "rouge": {
+            "rouge1": 0.5454545454545454,
+            "rouge2": 0.3,
+            "rougeL": 0.45454545454545453,
+            "rougeLsum": 0.5454545454545454,
+            "avg": 0.46136363636363636
+        },
+        "codebleu": {
+            "codebleu": 0.32791986446706456,
+            "ngram_match_score": 0.08165346762611622,
+            "weighted_ngram_match_score": 0.09669265690880861,
+            "syntax_match_score": 0.13333333333333333,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 6
+    },
+    {
+        "filename": "data/member/repository/FacultyRepository.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.repository;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.repository.IdJpaRepository;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.Faculty;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.University;\nimport org.springframework.stereotype.Repository;\n\n@Repos",
+        "middle": "itory\npublic interface FacultyRepository extends IdJpaRepository<Faculty, Long> {\n    boolean existsByNameEnAndUniversity(String nameEN, Univ",
+        "suffix": "ersity university);\n\n    boolean existsByNameAndUniversity(String name, University university);\n}\n",
+        "middle_prediction": "er.register(IdjpaRepository);\nclass IdjpaRepository(object):\n    def __init",
+        "exact_match": false,
+        "chrf": {
+            "score": 22.05775990665048,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 100.0,
+            "num_edits": 12,
+            "ref_length": 12.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.058823529411764705,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 0.8890097654027757,
+            "length_ratio": 0.8947368421052632,
+            "translation_length": 17,
+            "reference_length": 19
+        },
+        "rouge": {
+            "rouge1": 0.09523809523809525,
+            "rouge2": 0.0,
+            "rougeL": 0.09523809523809525,
+            "rougeLsum": 0.09523809523809525,
+            "avg": 0.07142857142857144
+        },
+        "codebleu": {
+            "codebleu": 0.3055555555555556,
+            "ngram_match_score": 0,
+            "weighted_ngram_match_score": 0,
+            "syntax_match_score": 0.2222222222222222,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 2
+    },
+    {
+        "filename": "data/member/dto/MemberUpdateDto.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.dto;\n\nimport io.swagger.v3.oas.annotations.media.Schema;\nimport jakarta.validation.constraints.*;\nimport lombok.Data;\n\n@Data\npublic class MemberUpdateDto {\n\n    @Schema(example = \"Naftenko\")\n    @NotBlank(message = \"First name cannot be blank\")\n    private String firstName",
+        "middle": ";\n\n    @Schema(example = \"Petrolijevic\")\n    @NotBlank(message = \"Middle name cannot be blank\")\n    private String middleName;\n\n    @Schema(example = \"Benzinov\")\n    @NotBlan",
+        "suffix": "k(message = \"Last name cannot be blank\")\n    private String lastName;\n\n    @Schema(example = \"false\")\n    @NotNull(message = \"Identity check cannot be blank\")\n    private boolean identityCheck;\n\n    @Schema(example = \"Aa123456\")\n    @Pattern(regexp = \"^(?=.*[\\\\d])(?=.*[a-z])(?=.*[A-Z])(?=\\\\S+$).{8,}$|^$\",\n            message = \"Password must contain at least one digit, one lowercase letter, one uppercase letter, and be at least 8 characters long, or it can be empty.\")\n    private String password;\n\n    @Schema(example = \"{{$randomEmail}}\")\n    @NotBlank(message = \"Active email cannot be blank\")\n    @Email(message = \"Invalid email\")\n    private String activeEmail;\n\n    @Schema(example = \"Did not find country\")\n    @NotBlank(message = \"Note cannot be blank\")\n    private String note;\n\n    @Schema(example = \"CZE\")\n    @Size(max = 3, message = \"CountryShort must be at most 3 characters long\")\n    @NotBlank(message = \"Country cannot be blank.\")\n    private String countryShort;\n\n    @Schema(example = \"Praha\")\n    @NotBlank(message = \"Birth city cannot be blank.\")\n    private String birthCity;\n}\n",
+        "middle_prediction": " = String lastName = String password = String activeEmail = String note = String countryShort = String birth",
+        "exact_match": false,
+        "chrf": {
+            "score": 12.3647552282583,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 83.33333333333334,
+            "num_edits": 15,
+            "ref_length": 18.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.2222222222222222,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 0.32919298780790557,
+            "length_ratio": 0.47368421052631576,
+            "translation_length": 18,
+            "reference_length": 38
+        },
+        "rouge": {
+            "rouge1": 0.06896551724137931,
+            "rouge2": 0.0,
+            "rougeL": 0.06896551724137931,
+            "rougeLsum": 0.06896551724137931,
+            "avg": 0.05172413793103448
+        },
+        "codebleu": {
+            "codebleu": 0.25745151667458144,
+            "ngram_match_score": 0.015276780223747026,
+            "weighted_ngram_match_score": 0.014529286474578665,
+            "syntax_match_score": 0.0,
+            "dataflow_match_score": 0.0
+        },
+        "manual_evaluation": 2
+    },
+    {
+        "filename": "data/member/dto/RoomAccommodationResponseDto.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.dto;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.dto.RecordableDeleteEntityResponseDto;\nimport io.swagger.v3.oas.annotations.media.Schema;\nimport lombok.Data;\nimport lombok.EqualsAndHashCode;\n\n@EqualsAndHashCode(callSuper = true)\n@Data\npublic cl",
+        "middle": "ass RoomAccommodationResponseDto extends RecordableDeleteEntityResponseDto {\n\n    @Schema(example = \"88\")\n    private Long idRoomAccommodation;\n    private MemberResponseDto ",
+        "suffix": "member;\n    private RoomResponseDto room;\n\n}\n",
+        "middle_prediction": "ass RoomResponseDto room;\n\n@Data\npublic void main(RoomResponseDto room)",
+        "exact_match": false,
+        "chrf": {
+            "score": 22.55108683506865,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 92.3076923076923,
+            "num_edits": 12,
+            "ref_length": 13.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.38461538461538464,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 0.5836454781435741,
+            "length_ratio": 0.65,
+            "translation_length": 13,
+            "reference_length": 20
+        },
+        "rouge": {
+            "rouge1": 0.09523809523809525,
+            "rouge2": 0.0,
+            "rougeL": 0.09523809523809525,
+            "rougeLsum": 0.09523809523809525,
+            "avg": 0.07142857142857144
+        },
+        "codebleu": {
+            "codebleu": 0.3105867716943268,
+            "ngram_match_score": 0.014867523320266895,
+            "weighted_ngram_match_score": 0.01319384917132593,
+            "syntax_match_score": 0.21428571428571427,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 2
+    },
+    {
+        "filename": "data/member/dto/LanguageResponseDto.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.dto;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.dto.RecordableDeleteEntityAndMemberResponseDto;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.enums.PreferredLangEnum;\nimport io.swagger.v3.oas.annotations.media.Schema;\nimport jakarta.validation.constraints.NotNull;\nimport jakarta.validation.constraints.Positive;\nimport lombok.Data;\nimport lombok.EqualsAndHashCode;\n\n@EqualsAndHashCode(callSuper = true)\n@Data\npublic class LanguageResponseDto extends RecordableDeleteEntityAndMemberResponseDto {\n\n    @Sch",
+        "middle": "ema(example = \"1\")\n    @Positive(message = \"idLanguage must be a positive integer.\")\n    @NotNull(message = \"idLanguage cannot be blank.\")\n    private Long idLanguage;\n\n\n    @Schema(example = ",
+        "suffix": "\"CZ\")\n    private PreferredLangEnum preferredLanguage;\n}\n",
+        "middle_prediction": "ema\n    public class RecordableDeleteEntityAndMemberResponseDto {\n        public String name;\n        public",
+        "exact_match": false,
+        "chrf": {
+            "score": 10.925126301521269,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 100.0,
+            "num_edits": 22,
+            "ref_length": 22.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.2,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 0.0301973834223185,
+            "length_ratio": 0.2222222222222222,
+            "translation_length": 10,
+            "reference_length": 45
+        },
+        "rouge": {
+            "rouge1": 0.06666666666666667,
+            "rouge2": 0.0,
+            "rougeL": 0.06666666666666667,
+            "rougeLsum": 0.06666666666666667,
+            "avg": 0.05
+        },
+        "codebleu": {
+            "codebleu": 0.2638888888888889,
+            "ngram_match_score": 0,
+            "weighted_ngram_match_score": 0,
+            "syntax_match_score": 0.05555555555555555,
+            "dataflow_match_score": 0.0
+        },
+        "manual_evaluation": 2
+    },
+    {
+        "filename": "data/member/repository/CountryRepository.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.repository;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.repository.IdJpaRepository;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.Country;\nimport org.springframework.data.jpa.repository.Query;\nimport org.springframework.stereotype.Repository;\n\nimport java.util.Optional;\n\n@Repository\npublic interface",
+        "middle": " CountryRepository extends IdJpaRepository<Country, Long> {\n\n    Optional<Country> findByCountryShort(String shortName);\n\n    @Query(\"SELECT c FROM Country c ORDER BY  c.priority DESC, c.countrySh",
+        "suffix": "ort, c.countryLong\")\n    Iterable<Country> findAllSorted();\n\n    boolean existsByCountryShort(String countryShort);\n\n    boolean existsByCountryLong(String countryLong);\n}\n",
+        "middle_prediction": "s Repository {\n    String name;\n    String countryShort;\n    String countryLong;\n\n    String country",
+        "exact_match": false,
+        "chrf": {
+            "score": 23.77300489838405,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 94.44444444444444,
+            "num_edits": 17,
+            "ref_length": 18.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.21428571428571427,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 0.18009231214795235,
+            "length_ratio": 0.3684210526315789,
+            "translation_length": 14,
+            "reference_length": 38
+        },
+        "rouge": {
+            "rouge1": 0.12121212121212122,
+            "rouge2": 0.0,
+            "rougeL": 0.12121212121212122,
+            "rougeLsum": 0.12121212121212122,
+            "avg": 0.09090909090909091
+        },
+        "codebleu": {
+            "codebleu": 0.2967290659942533,
+            "ngram_match_score": 0.009975840318370089,
+            "weighted_ngram_match_score": 0.01027375699197656,
+            "syntax_match_score": 0.16666666666666666,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 2
+    },
+    {
+        "filename": "data/member/controller/BlockAccessController.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.controller;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.AbstractMemberService;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.controller.AbstractMemberController;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.dto.RecordableDeleteEntityCreateDto;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.business.BlockAccessService;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.business.MemberService;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.BlockAccess;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.Member;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.dto.BlockAccessCreateDto;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.dto.BlockAccessResponseDto;\nimport io.swagger.v3.oas.annotations.Operation;\nimport io.swagger.v3.oas.annotations.Parameter;\nimport io.swagger.v3.oas.annotations.media.Content;\nimport io.swagger.v3.oas.annotations.media.Schema;\nimport io.swagger.v3.oas.annotations.responses.ApiResponse;\nimport io.swagger.v3.oas.annotations.tags.Tag;\nimport org.modelmapper.ModelMapper;\nimport org.springframework.data.domain.Page;\nimport org.springframework.data.domain.Pageable;\nimport org.springframework.data.domain.Sort;\nimport org.springframework.data.web.PageableDefault;\nimport org.springframework.http.HttpStatus;\nimport org.springframework.http.ResponseEntity;\nimport org.springframework.security.access.prepost.PreAuthorize;\nimport org.springframework.security.core.annotation.AuthenticationPrincipal;\nimport org.springframework.validation.annotation.Validated;\nimport org.springframework.web.bind.annotation.*;\n\nimport java.util.Map;\n\n@Tag(name = \"Member\")\n@RestController\npublic class BlockAccessController extends AbstractMemberController<BlockAccess, BlockAccessResponseDto, BlockAccessCreateDto> {\n\n    private final BlockAccessService blockAccessService;\n\n\n    BlockAccessController(ModelMapper modelMapper, BlockAccessService blockAccessService, MemberService memberService) {\n        super(modelMapper, memberService);\n        this.blockAccessService = blockAccessService;\n\n    }\n\n    @Operation(\n            summary = \"Get all block accesses related to member\",\n            description = \"This endpoint return block accesses related to member. Endpoint can filter out deleted block accesses.\"\n    )\n    @Override\n    @ResponseStatus(HttpStatus.OK)\n    @GetMapping(\"/members/{idMember}/block-accesses\")\n    @PreAuthorize(\"@memberAuthorization.canSeeAllMembersAndTheirMembershipsOrIsOwner(authentication, #idMember)\")\n    public ResponseEntity<Page<BlockAccessResponseDto>> getAllByMemberId(\n            @PathVariable Long idMember,\n            @RequestParam(required = false, defaultValue = \"true\") boolean isNotDeleted,\n            @RequestParam(required = false) Map<String, String> filterParams,\n\n            @PageableDefault(page = 0, size = 20, sort = \"createdAt\", direction = Sort.Direction.DESC)\n            Pageable pageable\n    ) {\n        return super.getAllByMemberId(idMember, isNotDeleted, filterParams, pageable);\n    }\n\n    @Operation(\n   ",
+        "middle": "         summary = \"Create b",
+        "suffix": "lock access\",\n            description = \"Create block access and link it to member.\"\n    )\n    @ApiResponse(responseCode = \"404\", content = @Content(schema = @Schema(example = \"{\\\"message\\\": \\\"Entity with id = 1 not found.\\\"}\")))\n    @ResponseStatus(HttpStatus.CREATED)\n    @PostMapping(\"/block-accesses\")\n    @PreAuthorize(\"@memberAuthorization.canBlockAccess(#loginMember, #blockAccessCreateDto)\")\n    public ResponseEntity<BlockAccessResponseDto> create(\n            @Validated @RequestBody BlockAccessCreateDto blockAccessCreateDto,\n            @AuthenticationPrincipal Member loginMember\n    ) {\n\n        BlockAccess newBlockAccess = convertToEntity(blockAccessCreateDto, loginMember);\n\n        newBlockAccess = this.blockAccessService.create(newBlockAccess);\n\n        return new ResponseEntity<>(convertToDto(newBlockAccess), HttpStatus.CREATED);\n    }\n\n    @Operation(\n            summary = \"Delete block access\",\n            description = \"This endpoint will soft delete block access. In another words it will fill attributes related to deletion.\"\n    )\n    @Override\n    @ResponseStatus(HttpStatus.OK)\n    @PatchMapping(\"/block-accesses/{idBlockAccess}\")\n    @PreAuthorize(\"@memberAuthorization.isRegistrarOrOwner(authentication, @blockAccessService.getEntityById(#idBlockAccess).getMember().getIdMember() )\")\n    public ResponseEntity<BlockAccessResponseDto> deletion(@Validated @RequestBody RecordableDeleteEntityCreateDto recordableDeleteEntityCreateDto,\n                                                           @Parameter(description = \"The id of the block membership to delete\", example = \"{{idBlockAccess}}\", required = true) @PathVariable Long idBlockAccess,\n                                                           @AuthenticationPrincipal Member loginMember) {\n        return super.deletion(recordableDeleteEntityCreateDto, idBlockAccess, loginMember);\n    }\n\n    @Override\n    protected AbstractMemberService<BlockAccess> getService() {\n        return blockAccessService;\n    }\n\n    @Override\n    protected Class<BlockAccess> getEntityClass() {\n        return BlockAccess.class;\n    }\n\n    @Override\n    protected Class<BlockAccessResponseDto> getDtoClass() {\n        return BlockAccessResponseDto.class;\n    }\n}\n",
+        "middle_prediction": "     summary = \"Create block access\",\n            description = \"This endpoint will create block access. In",
+        "exact_match": false,
+        "chrf": {
+            "score": 52.45673036517612,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 275.0,
+            "num_edits": 11,
+            "ref_length": 4.0
+        },
+        "bleu": {
+            "bleu": 0.12673718536830808,
+            "precisions": [
+                0.21052631578947367,
+                0.16666666666666666,
+                0.11764705882352941,
+                0.0625
+            ],
+            "brevity_penalty": 1.0,
+            "length_ratio": 3.8,
+            "translation_length": 19,
+            "reference_length": 5
+        },
+        "rouge": {
+            "rouge1": 0.26666666666666666,
+            "rouge2": 0.15384615384615385,
+            "rougeL": 0.26666666666666666,
+            "rougeLsum": 0.26666666666666666,
+            "avg": 0.23846153846153845
+        },
+        "codebleu": {
+            "codebleu": 0.3616883301995071,
+            "ngram_match_score": 0.07069301148938888,
+            "weighted_ngram_match_score": 0.37606030930863943,
+            "syntax_match_score": 0.0,
+            "dataflow_match_score": 0
+        },
+        "manual_evaluation": 8
+    },
+    {
+        "filename": "data/member/controller/FacultyController.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.controller;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.controller.AbstractModelMapperController;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.business.FacultyService;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.business.UniversityService;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.Faculty;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.University;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.dto.FacultyCreateDto;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.dto.FacultyResponseDto;\nimport io.swagger.v3.oas.annotations.Operation;\nimport io.swagger.v3.oas.annotations.media.Content;\nimport io.swagger.v3.oas.annotations.media.Schema;\nimport io.swagger.v3.oas.annotations.responses.ApiResponse;\nimport io.swagger.v3.oas.annotations.tags.Tag;\nimport org.modelmapper.ModelMapper;\nimport org.springframework.http.HttpStatus;\nimport org.springframework.http.ResponseEntity;\nimport org.springframework.security.access.prepost.PreAuthorize;\nimport org.springframework.validation.annotation.Validated;\nimport org.springframework.web.bind.annotation.*;\n\nimport java.util.Collection;\n\n@Tag(name = \"Member\")\n@RestController\npublic class FacultyController extends AbstractModelMapperController<Faculty, FacultyResponseDto, FacultyCreateDto> {\n\n    private final FacultyService facultyService;\n    private final UniversityService universityService;\n\n    FacultyController(FacultyService facultyService, UniversityS",
+        "middle": "ervice universityService, ModelMapper modelMapper) {\n        super(modelMapper);\n        this.facultyService = ",
+        "suffix": "facultyService;\n        this.universityService = universityService;\n    }\n\n    @Operation(\n            summary = \"Get all faculties\",\n            description = \"Get all faculties.\"\n    )\n    @ResponseStatus(HttpStatus.OK)\n    @GetMapping(\"/faculties\")\n    public Collection<FacultyResponseDto> getAll() {\n        return convertManyToDTO(facultyService.getAll());\n    }\n\n    @Operation(\n            summary = \"Create faculty\",\n            description = \"Create faculty link to university\"\n    )\n    @ApiResponse(responseCode = \"409\", description = \"Entity already deleted\",\n            content = @Content(mediaType = \"application/json\", schema = @Schema(example = \"{\\\"message\\\": \\\"FacultyEn already exist on this university.\\\"}\")))\n    @ApiResponse(responseCode = \"404\", content = @Content(schema = @Schema(example = \"{\\\"message\\\": \\\"Entity with id = 1 not found.\\\"}\")))\n    @ResponseStatus(HttpStatus.CREATED)\n    @PostMapping(\"/faculties\")\n    @PreAuthorize(\"@memberAuthorization.isRegistrar(authentication)\")\n    public ResponseEntity<FacultyResponseDto> create(@Validated @RequestBody FacultyCreateDto newFaculty) {\n\n        Faculty newEntityFaculty = this.facultyService.create(convertToEntity(newFaculty));\n\n        return new ResponseEntity<>(convertToDto(newEntityFaculty), HttpStatus.CREATED);\n    }\n\n    @Override\n    protected Faculty convertToEntity(FacultyCreateDto facultyCreateDto) {\n\n        University university = this.universityService.getEntityById(facultyCreateDto.getIdUniversity());\n\n        Faculty faculty = super.convertToEntity(facultyCreateDto);\n        faculty.setUniversity(university);\n        return faculty;\n    }\n\n    @Override\n    protected Class<Faculty> getEntityClass() {\n        return Faculty.class;\n    }\n\n    @Override\n    protected Class<FacultyResponseDto> getDtoClass() {\n        return FacultyResponseDto.class;\n    }\n}\n",
+        "middle_prediction": "ervice universityService) {\n        this.facultyService = facultyService;\n        this.",
+        "exact_match": false,
+        "chrf": {
+            "score": 50.845123116417376,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 75.0,
+            "num_edits": 6,
+            "ref_length": 8.0
+        },
+        "bleu": {
+            "bleu": 0.24485547321266596,
+            "precisions": [
+                0.75,
+                0.5454545454545454,
+                0.3,
+                0.1111111111111111
+            ],
+            "brevity_penalty": 0.7165313105737893,
+            "length_ratio": 0.75,
+            "translation_length": 12,
+            "reference_length": 16
+        },
+        "rouge": {
+            "rouge1": 0.5714285714285715,
+            "rouge2": 0.3333333333333333,
+            "rougeL": 0.5714285714285715,
+            "rougeLsum": 0.5714285714285715,
+            "avg": 0.511904761904762
+        },
+        "codebleu": {
+            "codebleu": 0.19618056767644826,
+            "ngram_match_score": 0.07201170728284921,
+            "weighted_ngram_match_score": 0.06985342056580097,
+            "syntax_match_score": 0.14285714285714285,
+            "dataflow_match_score": 0.5
+        },
+        "manual_evaluation": 7
+    },
+    {
+        "filename": "data/member/business/FacultyService.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.business;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.AbstractService;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.exception.AttributeOfEntityTakenException;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.repository.IdJpaRepository;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.Faculty;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.repository.FacultyRepositor",
+        "middle": "y;\nimport org.springframework.stereotype.Service;\n\n@Service\npublic class FacultyService extends AbstractService<Facu",
+        "suffix": "lty> {\n    private final FacultyRepository facultyRepository;\n\n    public FacultyService(FacultyRepository facultyRepository) {\n        this.facultyRepository = facultyRepository;\n    }\n\n    @Override\n    protected IdJpaRepository<Faculty, Long> getRepository() {\n        return this.facultyRepository;\n    }\n\n    @Override\n    public Faculty create(Faculty faculty) {\n\n        if (facultyRepository.existsByNameEnAndUniversity(faculty.getNameEn(), faculty.getUniversity())) {\n            throw new AttributeOfEntityTakenException(\"NameEn already exist on university.\");\n        }\n\n        if (facultyRepository.existsByNameAndUniversity(faculty.getName(), faculty.getUniversity())) {\n            throw new AttributeOfEntityTakenException(\"Name already exist on university.\");\n        }\n\n        return super.create(faculty);\n    }\n}\n",
+        "middle_prediction": "y;\nimport cz.cvut.fit.kvasvojt.sinis.modules",
+        "exact_match": false,
+        "chrf": {
+            "score": 12.014685455240798,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 77.77777777777779,
+            "num_edits": 7,
+            "ref_length": 9.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.42857142857142855,
+                0.15384615384615385,
+                0.08333333333333333,
+                0.0
+            ],
+            "brevity_penalty": 0.6514390575310556,
+            "length_ratio": 0.7,
+            "translation_length": 14,
+            "reference_length": 20
+        },
+        "rouge": {
+            "rouge1": 0.1904761904761905,
+            "rouge2": 0.10526315789473685,
+            "rougeL": 0.1904761904761905,
+            "rougeLsum": 0.1904761904761905,
+            "avg": 0.16917293233082709
+        },
+        "codebleu": {
+            "codebleu": 0.3821650690424427,
+            "ngram_match_score": 0.03251851632960929,
+            "weighted_ngram_match_score": 0.051697315395717064,
+            "syntax_match_score": 0.4444444444444444,
+            "dataflow_match_score": 0.0
+        },
+        "manual_evaluation": 6
+    },
+    {
+        "filename": "data/member/business/BlockAccessService.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.business;\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.business.AbstractMemberService;\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.repository.MemberRecordJpaRepository;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.BlockAccess;\ni",
+        "middle": "mport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.Member;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.repository.BlockAccessRepository;\nimport org.springframework.stereotype.",
+        "suffix": "Service;\n\n@Service\npublic class BlockAccessService extends AbstractMemberService<BlockAccess> {\n    private final BlockAccessRepository blockAccessRepository;\n\n    public BlockAccessService(BlockAccessRepository blockAccessRepository) {\n        this.blockAccessRepository = blockAccessRepository;\n    }\n\n    @Override\n    protected MemberRecordJpaRepository<BlockAccess, Long> getRepository() {\n        return this.blockAccessRepository;\n    }\n\n    public boolean isBlockByMembership(Member e) {\n        return blockAccessRepository.isBlock(e);\n    }\n}\n",
+        "middle_prediction": "mport cz.cvut.fit.kvasvojt.sinis.modules.member",
+        "exact_match": false,
+        "chrf": {
+            "score": 29.011519902245443,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 83.33333333333334,
+            "num_edits": 5,
+            "ref_length": 6.0
+        },
+        "bleu": {
+            "bleu": 0.10923150889627105,
+            "precisions": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "brevity_penalty": 0.10923150889627105,
+            "length_ratio": 0.3111111111111111,
+            "translation_length": 14,
+            "reference_length": 45
+        },
+        "rouge": {
+            "rouge1": 0.5,
+            "rouge2": 0.4666666666666667,
+            "rougeL": 0.5,
+            "rougeLsum": 0.5,
+            "avg": 0.4916666666666667
+        },
+        "codebleu": {
+            "codebleu": 0.27894224706613696,
+            "ngram_match_score": 0.020237345084409754,
+            "weighted_ngram_match_score": 0.033031643180138064,
+            "syntax_match_score": 0.0625,
+            "dataflow_match_score": 0.0
+        },
+        "manual_evaluation": 8
+    },
+    {
+        "filename": "data/member/dto/RoleAssignmentCreateDto.java",
+        "prefix": "package cz.cvut.fit.kvasvojt.sinis.modules.member.dto;\n\n\nimport cz.cvut.fit.kvasvojt.sinis.abstract_classes.dto.MemberCreateDto;\nimport cz.cvut.fit.kvasvojt.sinis.modules.member.domain.enums.RoleTypeEnum;\nimport io.swagger.v3.oas.annotations.media.Schema;\nimport jakarta.validation.constraints.NotNull;\nimport lombok.Data;\nimport lom",
+        "middle": "bok.EqualsAndHashCode;\n\n@EqualsAndHashCode(callSuper = true)\n@Data\npublic class RoleAssignmentCreateDto extends MemberCreateDto ",
+        "suffix": "{\n\n    @Schema(example = \"ROLE_NET_ADMIN\")\n    @NotNull(message = \"Role cannot be blank\")\n    private RoleTypeEnum role;\n}\n",
+        "middle_prediction": "ut.validation.constraints.NotNull;\nimport lom.validation.constraints.NotNull;\n",
+        "exact_match": false,
+        "chrf": {
+            "score": 9.372984801631565,
+            "char_order": 6,
+            "word_order": 0,
+            "beta": 2
+        },
+        "ter": {
+            "score": 100.0,
+            "num_edits": 10,
+            "ref_length": 10.0
+        },
+        "bleu": {
+            "bleu": 0.0,
+            "precisions": [
+                0.11764705882352941,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "brevity_penalty": 0.9428731438548749,
+            "length_ratio": 0.9444444444444444,
+            "translation_length": 17,
+            "reference_length": 18
+        },
+        "rouge": {
+            "rouge1": 0.0,
+            "rouge2": 0.0,
+            "rougeL": 0.0,
+            "rougeLsum": 0.0,
+            "avg": 0.0
+        },
+        "codebleu": {
+            "codebleu": 0.275,
+            "ngram_match_score": 0,
+            "weighted_ngram_match_score": 0,
+            "syntax_match_score": 0.1,
+            "dataflow_match_score": 1.0
+        },
+        "manual_evaluation": 2
+    }
+]
