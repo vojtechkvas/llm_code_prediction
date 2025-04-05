@@ -18,5 +18,4 @@ pip install git+https://github.com/k4black/codebleu#egg=codebleu
 
 ```
 pip install tree-sitter-java
-
 ```
